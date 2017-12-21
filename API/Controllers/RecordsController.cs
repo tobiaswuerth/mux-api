@@ -53,7 +53,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 return StatusCode((Int32) HttpStatusCode.Unauthorized);
             }
 
-            return Ok(new MusicBrainzRecord() as IMusicBrainzRecord); // todo load from db
+            return Ok(new MusicBrainzRecord()); // todo load from db
         }
 
         [HttpGet("api/v1/auth/records/{id}/sources")]

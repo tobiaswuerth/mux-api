@@ -20,15 +20,14 @@ namespace ch.wuerth.tobias.mux.API.Controllers
     {
         private readonly JwtAuthenticator _authenticator;
         private readonly Int32 _expirationShift;
+        private readonly String _secret;
 
         private readonly LoggerBundle _logger = new LoggerBundle
         {
             Exception = new ExceptionConsoleLogger(null), // todo
             Information = new InformationConsoleLogger(null) // todo
         };
-
-        private readonly String _secret;
-
+        
         public LoginController(IConfiguration configuration)
         {
             _secret = configuration[JwtConfig.JWT_SECRET_KEY];
@@ -42,7 +41,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
             try
             {
                 //validate data
-                if (String.IsNullOrWhiteSpace(values?.Password) || String.IsNullOrWhiteSpace(values?.Username))
+                if (String.IsNullOrWhiteSpace(values?.Password) || String.IsNullOrWhiteSpace(values.Username))
                 {
                     return StatusCode((Int32) HttpStatusCode.Unauthorized);
                 }
@@ -80,7 +79,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
 
                 // prepare token generation
                 (JwtPayload output, Boolean success) jp =
-                    new JwtPayloadProcessor(_secret, _expirationShift).Handle(user, _logger);
+                    new JwtPayloadProcessor(_expirationShift).Handle(user, _logger);
 
                 return ProcessPayload(jp);
             }
@@ -121,7 +120,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 }
 
                 (JwtPayload output, Boolean success) pp =
-                    new JwtPayloadProcessor(_secret, _expirationShift).Handle(authRes.output, _logger);
+                    new JwtPayloadProcessor(_expirationShift).Handle(authRes.output, _logger);
 
                 return ProcessPayload(pp);
             }

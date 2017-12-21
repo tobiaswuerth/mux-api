@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using JWT;
 using JWT.Algorithms;
 using JWT.Serializers;
