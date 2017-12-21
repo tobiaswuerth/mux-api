@@ -24,7 +24,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
 
         public RecordsController(IConfiguration configuration)
         {
-            _authenticator = new JwtAuthenticator(configuration["jwt:secret"]);
+            _authenticator = new JwtAuthenticator(configuration[JwtConfig.JWT_SECRET_KEY]);
         }
 
         [HttpGet("api/v1/auth/records")]

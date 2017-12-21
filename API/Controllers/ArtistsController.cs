@@ -12,7 +12,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace ch.wuerth.tobias.mux.API.Controllers
 {
-    public class ReleasesController : Controller
+    public class ArtistsController : Controller
     {
         private readonly JwtAuthenticator _authenticator;
 
@@ -22,12 +22,12 @@ namespace ch.wuerth.tobias.mux.API.Controllers
             Information = new InformationFileLogger(null) // todo callback
         };
 
-        public ReleasesController(IConfiguration configuration)
+        public ArtistsController(IConfiguration configuration)
         {
             _authenticator = new JwtAuthenticator(configuration[JwtConfig.JWT_SECRET_KEY]);
         }
 
-        [HttpGet("api/v1/auth/releases")]
+        [HttpGet("api/v1/auth/artists")]
         public IActionResult GetAll([FromQuery(Name = "ps")] Int32 pageSize = 50,
             [FromQuery(Name = "p")] Int32 page = 0)
         {
@@ -37,15 +37,15 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 return StatusCode((Int32) HttpStatusCode.Unauthorized);
             }
 
-            return Ok(new List<IMusicBrainzRelease>
+            return Ok(new List<IMusicBrainzArtist>
             {
-                new MusicBrainzRelease(),
-                new MusicBrainzRelease(),
-                new MusicBrainzRelease()
+                new MusicBrainzArtist(),
+                new MusicBrainzArtist(),
+                new MusicBrainzArtist()
             }); // todo load from db
         }
 
-        [HttpGet("api/v1/auth/releases/{id}")]
+        [HttpGet("api/v1/auth/artists/{id}")]
         public IActionResult GetById(Int32? id, [FromQuery(Name = "ps")] Int32 pageSize = 50,
             [FromQuery(Name = "p")] Int32 page = 0)
         {
@@ -60,10 +60,10 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 return StatusCode((Int32) HttpStatusCode.Unauthorized);
             }
 
-            return Ok(new MusicBrainzRelease()); // todo load from db
+            return Ok(new MusicBrainzArtist()); // todo load from db
         }
 
-        [HttpGet("api/v1/auth/releases/{id}/records")]
+        [HttpGet("api/v1/auth/artists/{id}/records")]
         public IActionResult GetRecordsById(Int32? id, [FromQuery(Name = "ps")] Int32 pageSize = 50,
             [FromQuery(Name = "p")] Int32 page = 0)
         {
@@ -86,34 +86,11 @@ namespace ch.wuerth.tobias.mux.API.Controllers
             }); // todo load from db
         }
 
-        [HttpGet("api/v1/auth/releases/{id}/artists")]
+        [HttpGet("api/v1/auth/artists/{id}/releases")]
         public IActionResult GetArtistsById(Int32? id, [FromQuery(Name = "ps")] Int32 pageSize = 50,
             [FromQuery(Name = "p")] Int32 page = 0)
         {
             if (id == null)
-            {
-                return StatusCode((Int32) HttpStatusCode.BadRequest);
-            }
-
-            (JwtPayload output, Boolean success) authRes = _authenticator.Handle(HttpContext, _logger);
-            if (!authRes.success)
-            {
-                return StatusCode((Int32) HttpStatusCode.Unauthorized);
-            }
-
-            return Ok(new List<IMusicBrainzArtist>
-            {
-                new MusicBrainzArtist(),
-                new MusicBrainzArtist(),
-                new MusicBrainzArtist()
-            }); // todo load from db
-        }
-
-        [HttpGet("api/v1/auth/releases/search/{query}")]
-        public IActionResult GetBySearchQuery(String query, [FromQuery(Name = "ps")] Int32 pageSize = 50,
-            [FromQuery(Name = "p")] Int32 page = 0)
-        {
-            if (query == null)
             {
                 return StatusCode((Int32) HttpStatusCode.BadRequest);
             }
@@ -129,6 +106,29 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 new MusicBrainzRelease(),
                 new MusicBrainzRelease(),
                 new MusicBrainzRelease()
+            }); // todo load from db
+        }
+
+        [HttpGet("api/v1/auth/artists/search/{query}")]
+        public IActionResult GetBySearchQuery(String query, [FromQuery(Name = "ps")] Int32 pageSize = 50,
+            [FromQuery(Name = "p")] Int32 page = 0)
+        {
+            if (query == null)
+            {
+                return StatusCode((Int32) HttpStatusCode.BadRequest);
+            }
+
+            (JwtPayload output, Boolean success) authRes = _authenticator.Handle(HttpContext, _logger);
+            if (!authRes.success)
+            {
+                return StatusCode((Int32) HttpStatusCode.Unauthorized);
+            }
+
+            return Ok(new List<IMusicBrainzArtist>
+            {
+                new MusicBrainzArtist(),
+                new MusicBrainzArtist(),
+                new MusicBrainzArtist()
             }); // todo load from db
         }
     }
