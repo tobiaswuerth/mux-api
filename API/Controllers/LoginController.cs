@@ -36,7 +36,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         }
 
         [HttpPost("api/v1/public/login")]
-        public IActionResult Post([FromBody] AuthenticationModel values)
+        public IActionResult Login([FromBody] AuthenticationModel values)
         {
             try
             {
@@ -109,7 +109,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         }
 
         [HttpGet("api/v1/public/login")]
-        public IActionResult GetFreshToken()
+        public IActionResult RefreshToken()
         {
             try
             {
