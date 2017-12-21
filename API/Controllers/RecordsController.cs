@@ -45,8 +45,14 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         }
 
         [HttpGet("api/v1/auth/records/{id}")]
-        public IActionResult GetById(Int32 id)
+        public IActionResult GetById(Int32? id, [FromQuery(Name = "ps")] Int32 pageSize = 50,
+            [FromQuery(Name = "p")] Int32 page = 0)
         {
+            if (id == null)
+            {
+                return StatusCode((Int32) HttpStatusCode.BadRequest);
+            }
+
             (JwtPayload output, Boolean success) authRes = _authenticator.Handle(HttpContext, _logger);
             if (!authRes.success)
             {
@@ -57,25 +63,32 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         }
 
         [HttpGet("api/v1/auth/records/{id}/tracks")]
-        public IActionResult GetFilesById(Int32 id)
+        public IActionResult GetFilesById(Int32? id, [FromQuery(Name = "ps")] Int32 pageSize = 50,
+            [FromQuery(Name = "p")] Int32 page = 0)
         {
+            if (id == null)
+            {
+                return StatusCode((Int32) HttpStatusCode.BadRequest);
+            }
+
             (JwtPayload output, Boolean success) authRes = _authenticator.Handle(HttpContext, _logger);
             if (!authRes.success)
             {
-                return StatusCode((Int32)HttpStatusCode.Unauthorized);
+                return StatusCode((Int32) HttpStatusCode.Unauthorized);
             }
 
-            return Ok(new List<ITrack>
-            {
-                new Track(),
-                new Track(),
-                new Track()
-            }); // todo load from db
+            return Ok(new List<ITrack> {new Track(), new Track(), new Track()}); // todo load from db
         }
 
         [HttpGet("api/v1/auth/records/{id}/releases")]
-        public IActionResult GetReleasesById(Int32 id)
+        public IActionResult GetReleasesById(Int32? id, [FromQuery(Name = "ps")] Int32 pageSize = 50,
+            [FromQuery(Name = "p")] Int32 page = 0)
         {
+            if (id == null)
+            {
+                return StatusCode((Int32) HttpStatusCode.BadRequest);
+            }
+
             (JwtPayload output, Boolean success) authRes = _authenticator.Handle(HttpContext, _logger);
             if (!authRes.success)
             {
@@ -91,8 +104,14 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         }
 
         [HttpGet("api/v1/auth/records/{id}/artists")]
-        public IActionResult GetArtistsById(Int32 id)
+        public IActionResult GetArtistsById(Int32? id, [FromQuery(Name = "ps")] Int32 pageSize = 50,
+            [FromQuery(Name = "p")] Int32 page = 0)
         {
+            if (id == null)
+            {
+                return StatusCode((Int32) HttpStatusCode.BadRequest);
+            }
+
             (JwtPayload output, Boolean success) authRes = _authenticator.Handle(HttpContext, _logger);
             if (!authRes.success)
             {
@@ -108,8 +127,14 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         }
 
         [HttpGet("api/v1/auth/records/search/{query}")]
-        public IActionResult GetBySearchQuery(String query)
+        public IActionResult GetBySearchQuery(String query, [FromQuery(Name = "ps")] Int32 pageSize = 50,
+            [FromQuery(Name = "p")] Int32 page = 0)
         {
+            if (query == null)
+            {
+                return StatusCode((Int32) HttpStatusCode.BadRequest);
+            }
+
             (JwtPayload output, Boolean success) authRes = _authenticator.Handle(HttpContext, _logger);
             if (!authRes.success)
             {

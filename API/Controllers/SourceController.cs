@@ -24,12 +24,17 @@ namespace ch.wuerth.tobias.mux.API.Controllers
 
         public SourceController(IConfiguration configuration)
         {
-            _authenticator = new JwtAuthenticator(configuration["jwt:secret"]);
+            _authenticator = new JwtAuthenticator(configuration[JwtConfig.JWT_SECRET_KEY]);
         }
 
         [HttpGet("api/v1/auth/source/{id}")]
-        public IActionResult GetById(Int32 id)
+        public IActionResult GetById(Int32? id)
         {
+            if (id == null)
+            {
+                return StatusCode((Int32)HttpStatusCode.BadRequest);
+            }
+
             (JwtPayload output, Boolean success) authRes = _authenticator.Handle(HttpContext, _logger);
             if (!authRes.success)
             {
