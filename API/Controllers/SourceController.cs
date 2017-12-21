@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
 using ch.wuerth.tobias.mux.API.security.jwt;
 using ch.wuerth.tobias.mux.Core.logging;
 using ch.wuerth.tobias.mux.Core.logging.exception;
@@ -32,13 +29,13 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         {
             if (id == null)
             {
-                return StatusCode((Int32)HttpStatusCode.BadRequest);
+                return StatusCode((Int32) HttpStatusCode.BadRequest);
             }
 
             (JwtPayload output, Boolean success) authRes = _authenticator.Handle(HttpContext, _logger);
             if (!authRes.success)
             {
-                return StatusCode((Int32)HttpStatusCode.Unauthorized);
+                return StatusCode((Int32) HttpStatusCode.Unauthorized);
             }
 
             return Ok("NOT IMPLEMENTED YET");

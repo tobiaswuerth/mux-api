@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using ch.wuerth.tobias.mux.Core.logging;
 using ch.wuerth.tobias.mux.Core.processor;
 using ch.wuerth.tobias.mux.Data.models;

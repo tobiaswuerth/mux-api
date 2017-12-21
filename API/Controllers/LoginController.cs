@@ -20,14 +20,15 @@ namespace ch.wuerth.tobias.mux.API.Controllers
     {
         private readonly JwtAuthenticator _authenticator;
         private readonly Int32 _expirationShift;
-        private readonly String _secret;
 
         private readonly LoggerBundle _logger = new LoggerBundle
         {
             Exception = new ExceptionConsoleLogger(null), // todo
             Information = new InformationConsoleLogger(null) // todo
         };
-        
+
+        private readonly String _secret;
+
         public LoginController(IConfiguration configuration)
         {
             _secret = configuration[JwtConfig.JWT_SECRET_KEY];
