@@ -1,10 +1,9 @@
 ﻿using System;
-using ch.wuerth.tobias.mux.API.security.jwt;
 using JWT;
 using JWT.Algorithms;
 using JWT.Serializers;
 
-namespace ch.wuerth.tobias.mux.API.security
+namespace ch.wuerth.tobias.mux.API.security.jwt
 {
     public static class JwtGenerator
     {
