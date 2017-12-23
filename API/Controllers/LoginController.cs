@@ -4,9 +4,6 @@ using System.Linq;
 using System.Net;
 using ch.wuerth.tobias.mux.API.security.jwt;
 using ch.wuerth.tobias.mux.API.security.models;
-using ch.wuerth.tobias.mux.Core.logging;
-using ch.wuerth.tobias.mux.Core.logging.exception;
-using ch.wuerth.tobias.mux.Core.logging.information;
 using ch.wuerth.tobias.mux.Core.processor;
 using ch.wuerth.tobias.mux.Data;
 using ch.wuerth.tobias.mux.Data.models;
@@ -16,35 +13,21 @@ using Microsoft.Extensions.Configuration;
 
 namespace ch.wuerth.tobias.mux.API.Controllers
 {
-    public class LoginController : Controller
+    public class LoginController : DataController
     {
-        private readonly JwtAuthenticator _authenticator;
         private readonly Int32 _expirationShift;
-
-        private readonly LoggerBundle _logger = new LoggerBundle
-        {
-            Exception = new ExceptionConsoleLogger(null), // todo
-            Information = new InformationConsoleLogger(null) // todo
-        };
-
         private readonly String _secret;
 
-        public LoginController(IConfiguration configuration)
+        public LoginController(IConfiguration configuration) : base(configuration)
         {
             _secret = configuration[JwtConfig.JWT_SECRET_KEY];
             _expirationShift = Convert.ToInt32(configuration[JwtConfig.JWT_EXPIRATION_SHIFT_KEY]);
-            _authenticator = new JwtAuthenticator(_secret);
         }
 
-        private IActionResult ProcessPayload((JwtPayload output, Boolean success) jp)
+        private IActionResult ProcessPayload(JwtPayload payload)
         {
-            if (!jp.success)
-            {
-                return StatusCode((Int32) HttpStatusCode.InternalServerError);
-            }
-
             // generate token
-            String token = JwtGenerator.GetToken(jp.output, _secret);
+            String token = JwtGenerator.GetToken(payload, _secret, _expirationShift);
 
             if (String.IsNullOrWhiteSpace(token))
             {
@@ -66,7 +49,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 }
 
                 // hash password
-                (String output, Boolean success) pp = new PasswordProcessor().Handle(values.Password, _logger);
+                (String output, Boolean success) pp = new PasswordProcessor().Handle(values.Password, Logger);
 
                 if (!pp.success)
                 {
@@ -78,7 +61,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
 
                 // check database for given username
                 User user;
-                using (DataContext dc = new DataContext(new DbContextOptions<DataContext>(), _logger))
+                using (DataContext dc = NewDataContext())
                 {
                     user = dc.SetUsers.AsNoTracking().FirstOrDefault(x => x.Username.Equals(values.Username));
                 }
@@ -96,15 +79,13 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 }
 
                 // prepare token generation
-                (JwtPayload output, Boolean success) jp =
-                    new JwtPayloadProcessor(_expirationShift).Handle(user, _logger);
+                (JwtPayload output, Boolean success) jp = new JwtPayloadProcessor().Handle(user, Logger);
 
-                return ProcessPayload(jp);
+                return !jp.success ? StatusCode((Int32) HttpStatusCode.InternalServerError) : ProcessPayload(jp.output);
             }
             catch (Exception ex)
             {
-                _logger.Exception?.Log(ex);
-                return StatusCode((Int32) HttpStatusCode.InternalServerError);
+                return HandleException(ex);
             }
         }
 
@@ -113,24 +94,11 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         {
             try
             {
-                // authorize
-                (JwtPayload output, Boolean success) authRes = _authenticator.Handle(HttpContext, _logger);
-                if (!authRes.success)
-                {
-                    return StatusCode((Int32) HttpStatusCode.Unauthorized);
-                }
-
-                // get payload
-                (JwtPayload output, Boolean success) pp =
-                    new JwtPayloadProcessor(_expirationShift).Handle(authRes.output, _logger);
-
-                // process payload
-                return ProcessPayload(pp);
+                return !IsAuthorized(out IActionResult statusCode) ? statusCode : ProcessPayload(AuthorizedPayload);
             }
             catch (Exception ex)
             {
-                _logger.Exception?.Log(ex);
-                return StatusCode((Int32) HttpStatusCode.InternalServerError);
+                return HandleException(ex);
             }
         }
     }

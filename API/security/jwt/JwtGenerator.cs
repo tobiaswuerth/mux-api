@@ -7,7 +7,7 @@ namespace ch.wuerth.tobias.mux.API.security.jwt
 {
     public static class JwtGenerator
     {
-        public static String GetToken(JwtPayload payload, String secret)
+        public static String GetToken(JwtPayload payload, String secret, Int32 expirationShift)
         {
             if (payload == null)
             {
@@ -17,6 +17,9 @@ namespace ch.wuerth.tobias.mux.API.security.jwt
             {
                 throw new ArgumentNullException(nameof(secret));
             }
+
+            payload.Iat = DateTime.Now;
+            payload.Exp = payload.Iat.AddMinutes(expirationShift); // in minutes
 
             IJwtAlgorithm algorithm = new HMACSHA256Algorithm();
             IJsonSerializer serializer = new JsonNetSerializer();

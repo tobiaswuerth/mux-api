@@ -26,6 +26,8 @@ namespace ch.wuerth.tobias.mux.API.Controllers
             _authenticator = new JwtAuthenticator(configuration[JwtConfig.JWT_SECRET_KEY]);
         }
 
+        protected JwtPayload AuthorizedPayload { get; private set; }
+
         protected static void NormalizePageSize(ref Int32 pageSize)
         {
             pageSize = pageSize > 100 ? 100 : pageSize < 0 ? 0 : pageSize;
@@ -37,6 +39,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
             if (authRes.success)
             {
                 statusCode = null;
+                AuthorizedPayload = authRes.output;
                 return true;
             }
 

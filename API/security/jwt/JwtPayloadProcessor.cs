@@ -7,13 +7,6 @@ namespace ch.wuerth.tobias.mux.API.security.jwt
 {
     public class JwtPayloadProcessor : IProcessor<User, JwtPayload>, IProcessor<JwtPayload, JwtPayload>
     {
-        private readonly Int32 _expirationShift;
-
-        public JwtPayloadProcessor(Int32 expirationShift)
-        {
-            _expirationShift = expirationShift;
-        }
-
         public (JwtPayload output, Boolean success) Handle(JwtPayload input, LoggerBundle logger)
         {
             if (input == null)
@@ -22,7 +15,6 @@ namespace ch.wuerth.tobias.mux.API.security.jwt
                 return (null, false);
             }
 
-            ShiftPayloadDate(input);
             return (input, true);
         }
 
@@ -34,15 +26,7 @@ namespace ch.wuerth.tobias.mux.API.security.jwt
                 return (null, false);
             }
 
-            JwtPayload payload = new JwtPayload {Name = input.Username};
-            ShiftPayloadDate(payload);
-            return (payload, true);
-        }
-
-        private void ShiftPayloadDate(JwtPayload payload)
-        {
-            payload.Exp = DateTime.Now.AddDays(_expirationShift);
-            payload.Iat = DateTime.Now;
+            return (new JwtPayload {Name = input.Username}, true);
         }
     }
 }
