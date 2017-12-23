@@ -36,7 +36,25 @@ namespace ch.wuerth.tobias.mux.API.Controllers
             _authenticator = new JwtAuthenticator(_secret);
         }
 
-        [HttpPost("api/v1/public/login")]
+        private IActionResult ProcessPayload((JwtPayload output, Boolean success) jp)
+        {
+            if (!jp.success)
+            {
+                return StatusCode((Int32) HttpStatusCode.InternalServerError);
+            }
+
+            // generate token
+            String token = JwtGenerator.GetToken(jp.output, _secret);
+
+            if (String.IsNullOrWhiteSpace(token))
+            {
+                return StatusCode((Int32) HttpStatusCode.InternalServerError);
+            }
+
+            return Ok(new Dictionary<String, String> {{"token", token}});
+        }
+
+        [HttpPost("public/login")]
         public IActionResult Login([FromBody] AuthenticationModel values)
         {
             try
@@ -62,8 +80,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 User user;
                 using (DataContext dc = new DataContext(new DbContextOptions<DataContext>(), _logger))
                 {
-                    user = dc.SetUsers.AsNoTracking().FirstOrDefault(x =>
-                        x.Username.Equals(values.Username, StringComparison.OrdinalIgnoreCase));
+                    user = dc.SetUsers.AsNoTracking().FirstOrDefault(x => x.Username.Equals(values.Username));
                 }
 
                 if (null == user)
@@ -91,38 +108,23 @@ namespace ch.wuerth.tobias.mux.API.Controllers
             }
         }
 
-        private IActionResult ProcessPayload((JwtPayload output, Boolean success) jp)
-        {
-            if (!jp.success)
-            {
-                return StatusCode((Int32) HttpStatusCode.InternalServerError);
-            }
-
-            // generate token
-            String token = JwtGenerator.GetToken(jp.output, _secret);
-
-            if (String.IsNullOrWhiteSpace(token))
-            {
-                return StatusCode((Int32) HttpStatusCode.InternalServerError);
-            }
-
-            return Ok(new Dictionary<String, String> {{"token", token}});
-        }
-
-        [HttpGet("api/v1/public/login")]
+        [HttpGet("public/login")]
         public IActionResult RefreshToken()
         {
             try
             {
+                // authorize
                 (JwtPayload output, Boolean success) authRes = _authenticator.Handle(HttpContext, _logger);
                 if (!authRes.success)
                 {
                     return StatusCode((Int32) HttpStatusCode.Unauthorized);
                 }
 
+                // get payload
                 (JwtPayload output, Boolean success) pp =
                     new JwtPayloadProcessor(_expirationShift).Handle(authRes.output, _logger);
 
+                // process payload
                 return ProcessPayload(pp);
             }
             catch (Exception ex)
