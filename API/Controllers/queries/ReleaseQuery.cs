@@ -21,5 +21,17 @@ FROM   musicbrainzrelease AS re
        JOIN musicbrainzrecord AS r 
          ON rr.musicbrainzrecord_uniqueid = r.uniqueid 
 WHERE  re.uniqueid = {0}";
+
+        public const String GET_ARTISTS_BY_ID = @"SELECT ac.[uniqueid], 
+       ac.[uniquehash], 
+       ac.[name], 
+       ac.[joinphrase], 
+       ac.[artist_uniqueid] 
+FROM   musicbrainzrelease AS re 
+       JOIN musicbrainzreleasemusicbrainzartistcredit AS rac 
+         ON re.uniqueid = rac.musicbrainzrelease_uniqueid 
+       JOIN musicbrainzartistcredit AS ac 
+         ON rac.musicbrainzartistcredit_uniqueid = ac.uniqueid 
+WHERE  re.uniqueid = {0}";
     }
 }
