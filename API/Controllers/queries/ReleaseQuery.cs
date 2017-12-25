@@ -51,5 +51,16 @@ FROM   musicbrainzrelease AS re
        JOIN musicbrainzalias AS a 
          ON ra.musicbrainzalias_uniqueid = a.uniqueid 
 WHERE  re.uniqueid = {0}";
+
+        public const String GET_RELEASE_EVENTS_BY_ID = @"SELECT re.[uniqueid], 
+       re.[uniquehash], 
+       re.[date], 
+       re.[area_uniqueid] 
+FROM   musicbrainzrelease AS r 
+       JOIN musicbrainzreleaseeventmusicbrainzrelease AS rre 
+         ON r.uniqueid = rre.musicbrainzrelease_uniqueid 
+       JOIN musicbrainzreleaseevent AS re 
+         ON re.uniqueid = rre.musicbrainzreleaseevent_uniqueid 
+WHERE  r.uniqueid = {0}";
     }
 }
