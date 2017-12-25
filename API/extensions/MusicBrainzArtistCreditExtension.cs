@@ -14,17 +14,7 @@ namespace ch.wuerth.tobias.mux.API.extensions
                 {"Joinphrase", ac.Joinphrase},
                 {
                     "Artist",
-                    new Dictionary<String, Object>
-                    {
-                        {"UniqueId", ac.Artist.UniqueId},
-                        {"Name", ac.Artist.Name},
-                        {"Disambiguation", ac.Artist.Disambiguation},
-                        {
-                            "Aliases",
-                            ac.Artist.MusicBrainzArtistMusicBrainzAliases.Select(y =>
-                                y.MusicBrainzAlias.ToJsonDictionary())
-                        }
-                    }
+                    ac.Artist?.ToJsonDictionary()
                 }
             };
         }
