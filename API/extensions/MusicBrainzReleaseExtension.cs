@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using ch.wuerth.tobias.mux.Data.models;
 
 namespace ch.wuerth.tobias.mux.API.extensions
@@ -24,7 +25,8 @@ namespace ch.wuerth.tobias.mux.API.extensions
                         {"Language", mbr.TextRepresentation?.Language},
                         {"Script", mbr.TextRepresentation?.Script}
                     }
-                }
+                },
+                {"Alias", mbr.MusicBrainzReleaseMusicBrainzAliases?.Select(x => x.MusicBrainzAlias?.ToJsonDictionary())}
             };
         }
     }

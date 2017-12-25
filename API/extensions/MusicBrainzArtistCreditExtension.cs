@@ -21,18 +21,8 @@ namespace ch.wuerth.tobias.mux.API.extensions
                         {"Disambiguation", ac.Artist.Disambiguation},
                         {
                             "Alias",
-                            ac.Artist.MusicBrainzArtistMusicBrainzAliases.Select(y => new Dictionary<String, Object>
-                            {
-                                {"UniqueId", y.MusicBrainzAlias.UniqueId},
-                                {"Name", y.MusicBrainzAlias.Name},
-                                {"ShortName", y.MusicBrainzAlias.ShortName},
-                                {"Primary", y.MusicBrainzAlias.Primary},
-                                {"Ended", y.MusicBrainzAlias.Ended},
-                                {"Begin", y.MusicBrainzAlias.Begin},
-                                {"End", y.MusicBrainzAlias.End},
-                                {"Locale", y.MusicBrainzAlias.Locale},
-                                {"Type", y.MusicBrainzAlias.Type}
-                            })
+                            ac.Artist.MusicBrainzArtistMusicBrainzAliases.Select(y =>
+                                y.MusicBrainzAlias.ToJsonDictionary())
                         }
                     }
                 }

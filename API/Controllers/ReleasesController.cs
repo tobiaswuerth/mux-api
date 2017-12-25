@@ -63,6 +63,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 using (DataContext dc = NewDataContext())
                 {
                     MusicBrainzRelease release = dc.SetReleases.AsNoTracking().Include(x => x.TextRepresentation)
+                        .Include(x => x.MusicBrainzReleaseMusicBrainzAliases).ThenInclude(x => x.MusicBrainzAlias)
                         .FirstOrDefault(x => x.UniqueId.Equals(id));
 
                     if (null == release)
@@ -204,7 +205,8 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 using (DataContext dc = NewDataContext())
                 {
                     return Ok(dc.SetReleases.AsNoTracking().Where(x => x.Title.Equals(query))
-                        .Include(x => x.TextRepresentation).Skip(page * pageSize).Take(pageSize)
+                        .Include(x => x.TextRepresentation).Include(x => x.MusicBrainzReleaseMusicBrainzAliases)
+                        .ThenInclude(x => x.MusicBrainzAlias).Skip(page * pageSize).Take(pageSize)
                         .Select(x => x.ToJsonDictionary()).ToList());
                 }
             }
