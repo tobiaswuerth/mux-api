@@ -179,5 +179,39 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 return HandleException(ex);
             }
         }
+
+        [HttpGet("auth/releases/lookup/{query}")]
+        public IActionResult GetByLookupQuery(String query, [FromQuery(Name = "ps")] Int32 pageSize = 50,
+            [FromQuery(Name = "p")] Int32 page = 0)
+        {
+            try
+            {
+                if (!IsAuthorized(out IActionResult result))
+                {
+                    return result;
+                }
+
+                // verify
+                if (String.IsNullOrWhiteSpace(query))
+                {
+                    return StatusCode((Int32) HttpStatusCode.BadRequest);
+                }
+
+                NormalizePageSize(ref pageSize);
+                query = query.Trim();
+
+                // get data
+                using (DataContext dc = NewDataContext())
+                {
+                    return Ok(dc.SetReleases.AsNoTracking().Where(x => x.Title.Equals(query))
+                        .Include(x => x.TextRepresentation).Skip(page * pageSize).Take(pageSize)
+                        .Select(x => x.ToJsonDictionary()).ToList());
+                }
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
+        }
     }
 }
