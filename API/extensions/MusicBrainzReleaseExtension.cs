@@ -25,8 +25,7 @@ namespace ch.wuerth.tobias.mux.API.extensions
                         {"Language", mbr.TextRepresentation?.Language},
                         {"Script", mbr.TextRepresentation?.Script}
                     }
-                },
-                {"Alias", mbr.MusicBrainzReleaseMusicBrainzAliases?.Select(x => x.MusicBrainzAlias?.ToJsonDictionary())}
+                }
             };
         }
     }
