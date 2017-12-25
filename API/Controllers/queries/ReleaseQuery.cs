@@ -33,5 +33,23 @@ FROM   musicbrainzrelease AS re
        JOIN musicbrainzartistcredit AS ac 
          ON rac.musicbrainzartistcredit_uniqueid = ac.uniqueid 
 WHERE  re.uniqueid = {0}";
+
+        public const String GET_ALIASES_BY_ID = @"SELECT a.[uniqueid], 
+       a.[uniquehash], 
+       a.[begin], 
+       a.[locale], 
+       a.[typeid], 
+       a.[end], 
+       a.[name], 
+       a.[type], 
+       a.[shortname], 
+       a.[primary], 
+       a.[ended] 
+FROM   musicbrainzrelease AS re 
+       JOIN musicbrainzreleasemusicbrainzalias AS ra 
+         ON ra.musicbrainzrelease_uniqueid = re.uniqueid 
+       JOIN musicbrainzalias AS a 
+         ON ra.musicbrainzalias_uniqueid = a.uniqueid 
+WHERE  re.uniqueid = {0}";
     }
 }
