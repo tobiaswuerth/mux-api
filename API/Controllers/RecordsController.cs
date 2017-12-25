@@ -180,6 +180,38 @@ namespace ch.wuerth.tobias.mux.API.Controllers
             }
         }
 
+        [HttpGet("auth/records/{id}/aliases")]
+        public IActionResult GetAliasesById(Int32? id, [FromQuery(Name = "ps")] Int32 pageSize = 50,
+            [FromQuery(Name = "p")] Int32 page = 0)
+        {
+            try
+            {
+                if (!IsAuthorized(out IActionResult result))
+                {
+                    return result;
+                }
+
+                // validate
+                if (id == null)
+                {
+                    return StatusCode((Int32) HttpStatusCode.BadRequest);
+                }
+
+                NormalizePageSize(ref pageSize);
+
+                // get data
+                using (DataContext dc = new DataContext(new DbContextOptions<DataContext>(), Logger))
+                {
+                    return Ok(dc.SetAliases.AsNoTracking().FromSql(RecordQuery.GET_ALIASES_BY_ID, id)
+                        .Skip(page * pageSize).Take(pageSize).Select(x => x.ToJsonDictionary()).ToList());
+                }
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
+        }
+
         [HttpGet("auth/records/search/{query}")]
         public IActionResult GetBySearchQuery(String query, [FromQuery(Name = "ps")] Int32 pageSize = 50,
             [FromQuery(Name = "p")] Int32 page = 0)

@@ -49,5 +49,23 @@ FROM   musicbrainzrecord AS r
        JOIN musicbrainzartistcredit AS ac 
          ON ac.uniqueid = rac.musicbrainzartistcredit_uniqueid 
 WHERE  r.uniqueid = {0} ";
+
+        public const String GET_ALIASES_BY_ID = @"SELECT a.[uniqueid], 
+       a.[uniquehash], 
+       a.[begin], 
+       a.[locale], 
+       a.[typeid], 
+       a.[end], 
+       a.[name], 
+       a.[type], 
+       a.[shortname], 
+       a.[primary], 
+       a.[ended] 
+FROM   musicbrainzrecord AS re 
+       JOIN musicbrainzaliasmusicbrainzrecord AS ra 
+         ON ra.musicbrainzrecord_uniqueid = re.uniqueid 
+       JOIN musicbrainzalias AS a 
+         ON ra.musicbrainzalias_uniqueid = a.uniqueid 
+WHERE  re.uniqueid = {0}";
     }
 }
