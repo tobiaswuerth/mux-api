@@ -20,7 +20,7 @@ namespace ch.wuerth.tobias.mux.API.extensions
                         {"Name", ac.Artist.Name},
                         {"Disambiguation", ac.Artist.Disambiguation},
                         {
-                            "Alias",
+                            "Aliases",
                             ac.Artist.MusicBrainzArtistMusicBrainzAliases.Select(y =>
                                 y.MusicBrainzAlias.ToJsonDictionary())
                         }
