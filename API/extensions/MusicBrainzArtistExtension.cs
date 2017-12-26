@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using ch.wuerth.tobias.mux.Data.models;
 
 namespace ch.wuerth.tobias.mux.API.extensions
