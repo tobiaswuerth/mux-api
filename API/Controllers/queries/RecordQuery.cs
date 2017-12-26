@@ -4,7 +4,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers.queries
 {
     public static class RecordQuery
     {
-        public const String GET_FILES_BY_ID = @"SELECT -1                                           AS 'UniqueId', 
+        public const String GET_TRACKS_BY_ID = @"SELECT -1                                           AS 'UniqueId', 
        ( Sum(ar.score) / Count(ar.track_uniqueid) ) AS 'Score', 
        -1                                           AS 'AcoustId_UniqueId', 
        ar.track_uniqueid 

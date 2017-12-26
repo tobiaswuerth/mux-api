@@ -81,7 +81,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         }
 
         [HttpGet("auth/records/{id}/tracks")]
-        public IActionResult GetFilesById(Int32? id, [FromQuery(Name = "ps")] Int32 pageSize = 50,
+        public IActionResult GetTracksById(Int32? id, [FromQuery(Name = "ps")] Int32 pageSize = 50,
             [FromQuery(Name = "p")] Int32 page = 0)
         {
             try
@@ -102,7 +102,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 // get data
                 using (DataContext dc = NewDataContext())
                 {
-                    return Ok(dc.SetAcoustIdResults.AsNoTracking().FromSql(RecordQuery.GET_FILES_BY_ID, id)
+                    return Ok(dc.SetAcoustIdResults.AsNoTracking().FromSql(RecordQuery.GET_TRACKS_BY_ID, id)
                         .Include(x => x.Track).OrderByDescending(x => x.Score).Skip(page * pageSize).Take(pageSize)
                         .Select(x => x.ToJsonDictionary()).ToList());
                 }
