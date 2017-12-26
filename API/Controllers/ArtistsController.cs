@@ -112,5 +112,38 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 return HandleException(ex);
             }
         }
+
+        [HttpGet("auth/artists/{id}/releases")]
+        public IActionResult GetReleasesById(Int32? id, [FromQuery(Name = "ps")] Int32 pageSize = 50,
+            [FromQuery(Name = "p")] Int32 page = 0)
+        {
+            try
+            {
+                if (!IsAuthorized(out IActionResult result))
+                {
+                    return result;
+                }
+
+                // validate
+                if (id == null)
+                {
+                    return StatusCode((Int32)HttpStatusCode.BadRequest);
+                }
+
+                NormalizePageSize(ref pageSize);
+
+                // get data
+                using (DataContext dc = NewDataContext())
+                {
+                    return Ok(dc.SetReleases.AsNoTracking().FromSql(ArtistQuery.GET_RELEASES_BY_ID, id)
+                        .Include(x => x.TextRepresentation)
+                        .Skip(pageSize * page).Take(pageSize).Select(x => x.ToJsonDictionary()).ToList());
+                }
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
+        }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace ch.wuerth.tobias.mux.API.Controllers.queries
 {
@@ -22,6 +23,28 @@ FROM   musicbrainzartist AS a
          ON acr.musicbrainzartistcredit_uniqueid = ac.uniqueid 
        JOIN musicbrainzrecord AS r 
          ON r.uniqueid = acr.musicbrainzrecord_uniqueid 
+WHERE  a.uniqueid = {0}";
+
+        public const String GET_RELEASES_BY_ID = @"SELECT r.[uniqueid], 
+       r.[uniquehash], 
+       r.[title], 
+       r.[status], 
+       r.[quality], 
+       r.[country], 
+       r.[date], 
+       r.[disambiguation], 
+       r.[statusid], 
+       r.[id], 
+       r.[packagingid], 
+       r.[barcode], 
+       r.[textrepresentation_uniqueid] 
+FROM   musicbrainzartist AS a 
+       JOIN musicbrainzartistcredit AS ac 
+         ON ac.uniqueid = a.uniqueid 
+       JOIN musicbrainzreleasemusicbrainzartistcredit AS acr 
+         ON acr.musicbrainzartistcredit_uniqueid = ac.uniqueid 
+       JOIN musicbrainzrelease AS r 
+         ON r.uniqueid = acr.musicbrainzrelease_uniqueid 
 WHERE  a.uniqueid = {0}";
     }
 }
