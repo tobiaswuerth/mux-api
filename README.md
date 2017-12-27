@@ -12,9 +12,9 @@ The following endpoints are implemented:
 
 ### Login
 * POST 	`public/login`					
-perform login with { username: "", password: ""} , returns { token: "" }
-* GET 	`public/login`				
-refresh login, returns expiration shifted { token: "" }
+perform login
+* GET 	`auth/login`				
+refresh JWT authorization token including expiration date
 
 ### Records
 * GET*	`auth/records`
