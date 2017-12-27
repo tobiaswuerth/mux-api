@@ -36,7 +36,7 @@ WHERE  a.uniqueid = {0}";
        r.[textrepresentation_uniqueid] 
 FROM   musicbrainzartist AS a 
        JOIN musicbrainzartistcredit AS ac 
-         ON ac.uniqueid = a.uniqueid 
+         ON ac.artist_uniqueid = a.uniqueid 
        JOIN musicbrainzreleasemusicbrainzartistcredit AS acr 
          ON acr.musicbrainzartistcredit_uniqueid = ac.uniqueid 
        JOIN musicbrainzrelease AS r 
