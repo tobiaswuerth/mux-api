@@ -19,7 +19,7 @@ namespace ch.wuerth.tobias.mux.API
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            app.UseCors(builder => builder.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin().Build());
             app.UseMvc();
         }
     }
