@@ -89,7 +89,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
             }
         }
 
-        [HttpGet("public/login")]
+        [HttpGet("auth/login")]
         public IActionResult RefreshToken()
         {
             try
