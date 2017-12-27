@@ -1,3 +1,80 @@
 **Parts:** [core](https://github.com/tobiaswuerth/mux-core) | [data](https://github.com/tobiaswuerth/mux-data) | [cli](https://github.com/tobiaswuerth/mux-cli) | [www](https://github.com/tobiaswuerth/mux-www) | *[api](https://github.com/tobiaswuerth/mux-api)*
 
-# mux-api
+# Mux - REST API
+
+This is the API which provides all the essential interfaces for the [www](https://github.com/tobiaswuerth/mux-www) part to work with.
+
+## Implementations
+
+The following endpoints are implemented:
+
+-----
+
+### Login
+* POST 	`public/login`					
+perform login with { username: "", password: ""} , returns { token: "" }
+* GET 	`public/login`				
+refresh login, returns expiration shifted { token: "" }
+
+### Records
+* GET*	`auth/records`
+all records
+* GET*	`auth/records/lookup/{query}`
+all records where record title matches exactly query
+* GET*	`auth/records/search/{query}`
+all records where record title matches like query
+* GET		`auth/records/{id}`
+one specific record 
+* GET*	`auth/records/{id}/tracks`
+all tracks of one record
+* GET*	`auth/records/{id}/releases`
+all releases of one record
+* GET*	`auth/records/{id}/artists`
+all artists of one record
+* GET*	`auth/records/{id}/aliases`
+all aliases of one record
+
+### Releases
+* GET*	`auth/releases`
+all releases
+* GET*	`auth/releases/lookup/{query}`
+all releases where release title matches exactly query
+* GET*	`auth/releases/search/{query}`
+all releases where release title matches like query
+* GET		`auth/releases/{id}`
+one specific release
+* GET*	`auth/releases/{id}/records`
+all records of a release
+* GET*	`auth/releases/{id}/artists`
+all artists of a release
+* GET*	`auth/releases/{id}/aliases`
+all aliases of a release
+* GET*	`auth/releases/{id}/events`
+all events of a release
+
+### Artists
+* GET*	`auth/artists`
+all artists
+* GET*	`auth/artists/search/{query}`
+all artists where name matches exactly query
+* GET*	`auth/artists/lookup/{query}`
+all artists where name matches like query 
+* GET		`auth/artists/{id}`
+one specific artist
+* GET*	`auth/artists/{id}/records`
+all records of an artist
+* GET*	`auth/artists/{id}/releases`
+all releases of an artist
+
+### Tracks
+* GET*	`auth/tracks`
+all tracks
+* GET		`auth/tracks/{id}`
+one specific track
+* GET*	`auth/tracks/{id}/records`
+all records of a track
+
+-----
+
+**Note:**
+\* = destination supports `?ps={int}` and `?p={int}` optional query parameters for page size and page index. If not defined, default values will be used instead.
