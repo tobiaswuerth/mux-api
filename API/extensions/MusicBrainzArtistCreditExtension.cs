@@ -10,8 +10,13 @@ namespace ch.wuerth.tobias.mux.API.extensions
         {
             return new Dictionary<String, Object>
             {
-                {"Joinphrase", ac.Joinphrase},
-                {"Artist", ac.Artist?.ToJsonDictionary()}
+                {
+                    "Joinphrase", ac.Joinphrase
+                }
+                ,
+                {
+                    "Artist", ac.Artist?.ToJsonDictionary()
+                }
             };
         }
     }

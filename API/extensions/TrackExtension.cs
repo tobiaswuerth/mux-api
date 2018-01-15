@@ -10,9 +10,17 @@ namespace ch.wuerth.tobias.mux.API.extensions
         {
             return new Dictionary<String, Object>
             {
-                {"UniqueId", track.UniqueId},
-                {"Duration", track.Duration},
-                {"Path", track.Path}
+                {
+                    "UniqueId", track.UniqueId
+                }
+                ,
+                {
+                    "Duration", track.Duration
+                }
+                ,
+                {
+                    "Path", track.Path
+                }
             };
         }
     }

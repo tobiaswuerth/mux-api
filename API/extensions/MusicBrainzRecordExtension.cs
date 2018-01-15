@@ -10,10 +10,21 @@ namespace ch.wuerth.tobias.mux.API.extensions
         {
             return new Dictionary<String, Object>
             {
-                {"UniqueId", record.UniqueId},
-                {"Title", record.Title},
-                {"Disambiguation", record.Disambiguation},
-                {"Length", record.Length}
+                {
+                    "UniqueId", record.UniqueId
+                }
+                ,
+                {
+                    "Title", record.Title
+                }
+                ,
+                {
+                    "Disambiguation", record.Disambiguation
+                }
+                ,
+                {
+                    "Length", record.Length
+                }
             };
         }
     }

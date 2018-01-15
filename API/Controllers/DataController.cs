@@ -1,10 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Net;
 using ch.wuerth.tobias.mux.API.security.jwt;
+using ch.wuerth.tobias.mux.Core.events;
 using ch.wuerth.tobias.mux.Core.logging;
 using ch.wuerth.tobias.mux.Core.logging.exception;
 using ch.wuerth.tobias.mux.Core.logging.information;
 using ch.wuerth.tobias.mux.Data;
+using global::ch.wuerth.tobias.mux.Core.global;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -13,38 +18,73 @@ namespace ch.wuerth.tobias.mux.API.Controllers
 {
     public abstract class DataController : Controller
     {
+        private static readonly ICallback<Exception> RethrowCallback = new RethrowCallback();
         private readonly JwtAuthenticator _authenticator;
 
         protected readonly LoggerBundle Logger = new LoggerBundle
         {
-            Exception = new ExceptionFileLogger(null),
-            Information = new InformationFileLogger(null) // todo callback
+            Exception = new ExceptionFileLogger(RethrowCallback)
+            , Information = new InformationFileLogger(RethrowCallback)
         };
+
+        private ApiConfig _config;
+
+        static DataController()
+        {
+            new List<String>
+                {
+                    Location.ApplicationDataDirectoryPath
+                    , Location.LogsDirectoryPath
+                    , Location.PluginsDirectoryPath
+                }.Where(x => !Directory.Exists(x))
+                .ToList()
+                .ForEach(x => Directory.CreateDirectory(x));
+        }
 
         protected DataController(IConfiguration configuration)
         {
-            _authenticator = new JwtAuthenticator(configuration[JwtConfig.JWT_SECRET_KEY]);
+            _authenticator = new JwtAuthenticator(Config.Authorization.Secret);
         }
+
+        protected ApiConfig Config
+        {
+            get
+            {
+                return _config ?? (_config = Configurator.RequestConfig<ApiConfig>(AuthConfigFilePath, Logger));
+            }
+        }
+
+        private static String AuthConfigFilePath { get; } = Path.Combine(Location.ApplicationDataDirectoryPath, "mux_config_auth");
 
         protected JwtPayload AuthorizedPayload { get; private set; }
 
-        protected static void NormalizePageSize(ref Int32 pageSize)
+        protected void NormalizePageSize(ref Int32 pageSize)
         {
-            pageSize = pageSize > 100 ? 100 : pageSize < 0 ? 0 : pageSize;
+            pageSize = pageSize > Config.ResultMaxPageSize ? Config.ResultMaxPageSize : pageSize < 0 ? 0 : pageSize;
         }
 
         protected Boolean IsAuthorized(out IActionResult statusCode)
         {
-            (JwtPayload output, Boolean success) authRes = _authenticator.Handle(HttpContext, Logger);
-            if (authRes.success)
+            (JwtPayload payload, Boolean success) = _authenticator.Handle(HttpContext, Logger);
+            if (!success)
             {
-                statusCode = null;
-                AuthorizedPayload = authRes.output;
-                return true;
+                statusCode = StatusCode((Int32) HttpStatusCode.Unauthorized);
+                return false;
             }
 
-            statusCode = StatusCode((Int32) HttpStatusCode.Unauthorized);
-            return false;
+            using (DataContext context = NewDataContext())
+            {
+                Boolean found = context.SetUsers.Any(x => x.UniqueId.Equals(payload.ClientId) && x.Username.ToLower().Equals(payload.Name));
+                if (!found)
+                {
+                    statusCode = StatusCode((Int32) HttpStatusCode.Unauthorized);
+                    return false;
+                }
+            }
+
+            statusCode = null;
+            AuthorizedPayload = payload;
+            return true;
         }
 
         protected IActionResult HandleException(Exception ex)

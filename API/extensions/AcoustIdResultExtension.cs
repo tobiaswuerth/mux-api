@@ -8,7 +8,16 @@ namespace ch.wuerth.tobias.mux.API.extensions
     {
         public static Dictionary<String, Object> ToJsonDictionary(this AcoustIdResult air)
         {
-            return new Dictionary<String, Object> {{"Score", air.Score}, {"Track", air.Track?.ToJsonDictionary()}};
+            return new Dictionary<String, Object>
+            {
+                {
+                    "Score", air.Score
+                }
+                ,
+                {
+                    "Track", air.Track?.ToJsonDictionary()
+                }
+            };
         }
     }
 }
