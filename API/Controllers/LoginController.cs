@@ -35,7 +35,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 }
                 ,
                 {
-                    "expires", payload.Exp.ToString(CultureInfo.InvariantCulture);
+                    "expires", payload.Exp.ToString(CultureInfo.InvariantCulture)
                 }
             });
         }
