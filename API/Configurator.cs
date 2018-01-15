@@ -10,6 +10,11 @@ namespace ch.wuerth.tobias.mux.API
     {
         public static T RequestConfig<T>(String configPath, LoggerBundle logger = null) where T : class
         {
+            if (configPath == null)
+            {
+                throw new ArgumentNullException(nameof(configPath));
+            }
+
             if (!File.Exists(configPath))
             {
                 logger?.Information?.Log($"File '{configPath}' not found. Trying to create it...");

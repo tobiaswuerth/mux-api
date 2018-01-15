@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -27,6 +28,18 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         };
 
         private ApiConfig _config;
+
+        static DataController()
+        {
+            new List<String>
+                {
+                    Location.ApplicationDataDirectoryPath
+                    , Location.LogsDirectoryPath
+                    , Location.PluginsDirectoryPath
+                }.Where(x => !Directory.Exists(x))
+                .ToList()
+                .ForEach(x => Directory.CreateDirectory(x));
+        }
 
         protected DataController(IConfiguration configuration)
         {
