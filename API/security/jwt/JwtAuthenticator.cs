@@ -38,14 +38,14 @@ namespace ch.wuerth.tobias.mux.API.security.jwt
                 }
 
                 // check for authorization header
-                String hkey = HttpRequestHeader.Authorization.ToString();
-                if (!headers.ContainsKey(hkey))
+                String headerKeyAuth = HttpRequestHeader.Authorization.ToString();
+                if (!headers.ContainsKey(headerKeyAuth))
                 {
                     throw new ArgumentNullException(nameof(headers));
                 }
 
                 // get header and validate content
-                StringValues values = headers[hkey];
+                StringValues values = headers[headerKeyAuth];
 
                 if (!values.Count.Equals(1))
                 {

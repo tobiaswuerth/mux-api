@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ch.wuerth.tobias.mux.API.security.models
+namespace ch.wuerth.tobias.mux.API.security
 {
     #region usings
 

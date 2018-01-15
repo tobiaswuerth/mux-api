@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using ch.wuerth.tobias.mux.API.security;
 using ch.wuerth.tobias.mux.API.security.jwt;
-using ch.wuerth.tobias.mux.API.security.models;
 using ch.wuerth.tobias.mux.Core.processor;
 using ch.wuerth.tobias.mux.Data;
 using ch.wuerth.tobias.mux.Data.models;
@@ -15,19 +15,12 @@ namespace ch.wuerth.tobias.mux.API.Controllers
 {
     public class LoginController : DataController
     {
-        private readonly Int32 _expirationShift;
-        private readonly String _secret;
-
-        public LoginController(IConfiguration configuration) : base(configuration)
-        {
-            _secret = configuration[JwtConfig.JWT_SECRET_KEY];
-            _expirationShift = Convert.ToInt32(configuration[JwtConfig.JWT_EXPIRATION_SHIFT_KEY]);
-        }
+        public LoginController(IConfiguration configuration) : base(configuration) { }
 
         private IActionResult ProcessPayload(JwtPayload payload)
         {
             // generate token
-            String token = JwtGenerator.GetToken(payload, _secret, _expirationShift);
+            String token = JwtGenerator.GetToken(payload, Config.Authorization.Secret, Config.Authorization.ExpirationShift);
 
             if (String.IsNullOrWhiteSpace(token))
             {
