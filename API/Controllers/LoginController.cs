@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using ch.wuerth.tobias.mux.API.security;
@@ -31,6 +32,10 @@ namespace ch.wuerth.tobias.mux.API.Controllers
             {
                 {
                     "token", token
+                }
+                ,
+                {
+                    "expires", payload.Exp.ToString(CultureInfo.InvariantCulture);
                 }
             });
         }
