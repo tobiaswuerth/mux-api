@@ -26,7 +26,10 @@ namespace ch.wuerth.tobias.mux.API.security.jwt
                 return (null, false);
             }
 
-            return (new JwtPayload {Name = input.Username}, true);
+            return (new JwtPayload
+            {
+                Name = input.Username
+            }, true);
         }
     }
 }

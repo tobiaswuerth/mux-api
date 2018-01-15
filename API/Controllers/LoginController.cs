@@ -34,11 +34,16 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 return StatusCode((Int32) HttpStatusCode.InternalServerError);
             }
 
-            return Ok(new Dictionary<String, String> {{"token", token}});
+            return Ok(new Dictionary<String, String>
+            {
+                {
+                    "token", token
+                }
+            });
         }
 
-        [HttpPost("public/login")]
-        public IActionResult Login([FromBody] AuthenticationModel values)
+        [ HttpPost("public/login") ]
+        public IActionResult Login([ FromBody ] AuthenticationModel values)
         {
             try
             {
@@ -89,7 +94,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
             }
         }
 
-        [HttpGet("auth/login")]
+        [ HttpGet("auth/login") ]
         public IActionResult RefreshToken()
         {
             try

@@ -17,8 +17,8 @@ namespace ch.wuerth.tobias.mux.API.Controllers
 
         protected readonly LoggerBundle Logger = new LoggerBundle
         {
-            Exception = new ExceptionFileLogger(null),
-            Information = new InformationFileLogger(null) // todo callback
+            Exception = new ExceptionFileLogger(null)
+            , Information = new InformationFileLogger(null) // todo callback
         };
 
         protected DataController(IConfiguration configuration)

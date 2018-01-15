@@ -16,9 +16,8 @@ namespace ch.wuerth.tobias.mux.API.Controllers
     {
         public ReleasesController(IConfiguration configuration) : base(configuration) { }
 
-        [HttpGet("auth/releases")]
-        public IActionResult GetAll([FromQuery(Name = "ps")] Int32 pageSize = 50,
-            [FromQuery(Name = "p")] Int32 page = 0)
+        [ HttpGet("auth/releases") ]
+        public IActionResult GetAll([ FromQuery(Name = "ps") ] Int32 pageSize = 50, [ FromQuery(Name = "p") ] Int32 page = 0)
         {
             try
             {
@@ -32,9 +31,20 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 // get data
                 using (DataContext dc = NewDataContext())
                 {
-                    return Ok(dc.SetReleases.AsNoTracking().Where(x => null != x.Title).Select(x => x.Title)
-                        .OrderBy(x => x).Distinct().Skip(page * pageSize).Take(pageSize)
-                        .Select(x => new Dictionary<String, Object> {{"Title", x}}).ToList());
+                    return Ok(dc.SetReleases.AsNoTracking()
+                        .Where(x => null != x.Title)
+                        .Select(x => x.Title)
+                        .OrderBy(x => x)
+                        .Distinct()
+                        .Skip(page * pageSize)
+                        .Take(pageSize)
+                        .Select(x => new Dictionary<String, Object>
+                        {
+                            {
+                                "Title", x
+                            }
+                        })
+                        .ToList());
                 }
             }
             catch (Exception ex)
@@ -43,7 +53,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
             }
         }
 
-        [HttpGet("auth/releases/{id}")]
+        [ HttpGet("auth/releases/{id}") ]
         public IActionResult GetById(Int32? id)
         {
             try
@@ -62,8 +72,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 // get data
                 using (DataContext dc = NewDataContext())
                 {
-                    MusicBrainzRelease release = dc.SetReleases.AsNoTracking().Include(x => x.TextRepresentation)
-                        .FirstOrDefault(x => x.UniqueId.Equals(id));
+                    MusicBrainzRelease release = dc.SetReleases.AsNoTracking().Include(x => x.TextRepresentation).FirstOrDefault(x => x.UniqueId.Equals(id));
 
                     if (null == release)
                     {
@@ -80,9 +89,8 @@ namespace ch.wuerth.tobias.mux.API.Controllers
             }
         }
 
-        [HttpGet("auth/releases/{id}/records")]
-        public IActionResult GetRecordsById(Int32? id, [FromQuery(Name = "ps")] Int32 pageSize = 50,
-            [FromQuery(Name = "p")] Int32 page = 0)
+        [ HttpGet("auth/releases/{id}/records") ]
+        public IActionResult GetRecordsById(Int32? id, [ FromQuery(Name = "ps") ] Int32 pageSize = 50, [ FromQuery(Name = "p") ] Int32 page = 0)
         {
             try
             {
@@ -102,8 +110,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 // get data
                 using (DataContext dc = NewDataContext())
                 {
-                    return Ok(dc.SetMusicBrainzRecords.AsNoTracking().FromSql(ReleaseQuery.GET_RECORDS_BY_ID, id)
-                        .Skip(pageSize * page).Take(pageSize).Select(x => x.ToJsonDictionary()).ToList());
+                    return Ok(dc.SetMusicBrainzRecords.AsNoTracking().FromSql(ReleaseQuery.GET_RECORDS_BY_ID, id).Skip(pageSize * page).Take(pageSize).Select(x => x.ToJsonDictionary()).ToList());
                 }
             }
             catch (Exception ex)
@@ -112,9 +119,8 @@ namespace ch.wuerth.tobias.mux.API.Controllers
             }
         }
 
-        [HttpGet("auth/releases/{id}/artists")]
-        public IActionResult GetArtistsById(Int32? id, [FromQuery(Name = "ps")] Int32 pageSize = 50,
-            [FromQuery(Name = "p")] Int32 page = 0)
+        [ HttpGet("auth/releases/{id}/artists") ]
+        public IActionResult GetArtistsById(Int32? id, [ FromQuery(Name = "ps") ] Int32 pageSize = 50, [ FromQuery(Name = "p") ] Int32 page = 0)
         {
             try
             {
@@ -134,10 +140,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 // get data
                 using (DataContext dc = NewDataContext())
                 {
-                    return Ok(dc.SetArtistCredits.AsNoTracking().FromSql(ReleaseQuery.GET_ARTISTS_BY_ID, id)
-                        .Include(x => x.Artist).ThenInclude(x => x.MusicBrainzArtistMusicBrainzAliases)
-                        .ThenInclude(x => x.MusicBrainzAlias).Skip(page * pageSize).Take(pageSize)
-                        .Select(x => x.ToJsonDictionary()).ToList());
+                    return Ok(dc.SetArtistCredits.AsNoTracking().FromSql(ReleaseQuery.GET_ARTISTS_BY_ID, id).Include(x => x.Artist).ThenInclude(x => x.MusicBrainzArtistMusicBrainzAliases).ThenInclude(x => x.MusicBrainzAlias).Skip(page * pageSize).Take(pageSize).Select(x => x.ToJsonDictionary()).ToList());
                 }
             }
             catch (Exception ex)
@@ -146,9 +149,8 @@ namespace ch.wuerth.tobias.mux.API.Controllers
             }
         }
 
-        [HttpGet("auth/releases/{id}/aliases")]
-        public IActionResult GetAliasesById(Int32? id, [FromQuery(Name = "ps")] Int32 pageSize = 50,
-            [FromQuery(Name = "p")] Int32 page = 0)
+        [ HttpGet("auth/releases/{id}/aliases") ]
+        public IActionResult GetAliasesById(Int32? id, [ FromQuery(Name = "ps") ] Int32 pageSize = 50, [ FromQuery(Name = "p") ] Int32 page = 0)
         {
             try
             {
@@ -168,8 +170,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 // get data
                 using (DataContext dc = NewDataContext())
                 {
-                    return Ok(dc.SetAliases.AsNoTracking().FromSql(ReleaseQuery.GET_ALIASES_BY_ID, id)
-                        .Skip(page * pageSize).Take(pageSize).Select(x => x.ToJsonDictionary()).ToList());
+                    return Ok(dc.SetAliases.AsNoTracking().FromSql(ReleaseQuery.GET_ALIASES_BY_ID, id).Skip(page * pageSize).Take(pageSize).Select(x => x.ToJsonDictionary()).ToList());
                 }
             }
             catch (Exception ex)
@@ -178,9 +179,8 @@ namespace ch.wuerth.tobias.mux.API.Controllers
             }
         }
 
-        [HttpGet("auth/releases/{id}/events")]
-        public IActionResult GetEventsById(Int32? id, [FromQuery(Name = "ps")] Int32 pageSize = 50,
-            [FromQuery(Name = "p")] Int32 page = 0)
+        [ HttpGet("auth/releases/{id}/events") ]
+        public IActionResult GetEventsById(Int32? id, [ FromQuery(Name = "ps") ] Int32 pageSize = 50, [ FromQuery(Name = "p") ] Int32 page = 0)
         {
             try
             {
@@ -200,10 +200,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 // get data
                 using (DataContext dc = NewDataContext())
                 {
-                    return Ok(dc.SetReleaseEvents.AsNoTracking().FromSql(ReleaseQuery.GET_RELEASE_EVENTS_BY_ID, id)
-                        .Include(x => x.Area).ThenInclude(x => x.MusicBrainzIsoCodeMusicBrainzAreas)
-                        .ThenInclude(x => x.MusicBrainzIsoCode).Skip(page * pageSize).Take(pageSize)
-                        .Select(x => x.ToJsonDictionary()).ToList());
+                    return Ok(dc.SetReleaseEvents.AsNoTracking().FromSql(ReleaseQuery.GET_RELEASE_EVENTS_BY_ID, id).Include(x => x.Area).ThenInclude(x => x.MusicBrainzIsoCodeMusicBrainzAreas).ThenInclude(x => x.MusicBrainzIsoCode).Skip(page * pageSize).Take(pageSize).Select(x => x.ToJsonDictionary()).ToList());
                 }
             }
             catch (Exception ex)
@@ -212,9 +209,8 @@ namespace ch.wuerth.tobias.mux.API.Controllers
             }
         }
 
-        [HttpGet("auth/releases/search/{query}")]
-        public IActionResult GetBySearchQuery(String query, [FromQuery(Name = "ps")] Int32 pageSize = 50,
-            [FromQuery(Name = "p")] Int32 page = 0)
+        [ HttpGet("auth/releases/search/{query}") ]
+        public IActionResult GetBySearchQuery(String query, [ FromQuery(Name = "ps") ] Int32 pageSize = 50, [ FromQuery(Name = "p") ] Int32 page = 0)
         {
             try
             {
@@ -235,9 +231,20 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 // get data
                 using (DataContext dc = NewDataContext())
                 {
-                    return Ok(dc.SetReleases.AsNoTracking().Where(x => x.Title.Contains(query)).Select(x => x.Title)
-                        .OrderBy(x => x).Distinct().Skip(page * pageSize).Take(pageSize)
-                        .Select(x => new Dictionary<String, Object> {{"Title", x}}).ToList());
+                    return Ok(dc.SetReleases.AsNoTracking()
+                        .Where(x => x.Title.Contains(query))
+                        .Select(x => x.Title)
+                        .OrderBy(x => x)
+                        .Distinct()
+                        .Skip(page * pageSize)
+                        .Take(pageSize)
+                        .Select(x => new Dictionary<String, Object>
+                        {
+                            {
+                                "Title", x
+                            }
+                        })
+                        .ToList());
                 }
             }
             catch (Exception ex)
@@ -246,9 +253,8 @@ namespace ch.wuerth.tobias.mux.API.Controllers
             }
         }
 
-        [HttpGet("auth/releases/lookup/{query}")]
-        public IActionResult GetByLookupQuery(String query, [FromQuery(Name = "ps")] Int32 pageSize = 50,
-            [FromQuery(Name = "p")] Int32 page = 0)
+        [ HttpGet("auth/releases/lookup/{query}") ]
+        public IActionResult GetByLookupQuery(String query, [ FromQuery(Name = "ps") ] Int32 pageSize = 50, [ FromQuery(Name = "p") ] Int32 page = 0)
         {
             try
             {
@@ -269,9 +275,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 // get data
                 using (DataContext dc = NewDataContext())
                 {
-                    return Ok(dc.SetReleases.AsNoTracking().Where(x => x.Title.Equals(query))
-                        .Include(x => x.TextRepresentation).Skip(page * pageSize).Take(pageSize)
-                        .Select(x => x.ToJsonDictionary()).ToList());
+                    return Ok(dc.SetReleases.AsNoTracking().Where(x => x.Title.Equals(query)).Include(x => x.TextRepresentation).Skip(page * pageSize).Take(pageSize).Select(x => x.ToJsonDictionary()).ToList());
                 }
             }
             catch (Exception ex)

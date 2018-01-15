@@ -10,19 +10,44 @@ namespace ch.wuerth.tobias.mux.API.extensions
         {
             return new Dictionary<String, Object>
             {
-                {"UniqueId", mbr.UniqueId},
-                {"Title", mbr.Title},
-                {"Disambiguation", mbr.Disambiguation},
-                {"Country", mbr.Country},
-                {"Date", mbr.Date},
-                {"Quality", mbr.Quality},
-                {"Status", mbr.Status},
                 {
-                    "TextRepresentation",
-                    new Dictionary<String, Object>
+                    "UniqueId", mbr.UniqueId
+                }
+                ,
+                {
+                    "Title", mbr.Title
+                }
+                ,
+                {
+                    "Disambiguation", mbr.Disambiguation
+                }
+                ,
+                {
+                    "Country", mbr.Country
+                }
+                ,
+                {
+                    "Date", mbr.Date
+                }
+                ,
+                {
+                    "Quality", mbr.Quality
+                }
+                ,
+                {
+                    "Status", mbr.Status
+                }
+                ,
+                {
+                    "TextRepresentation", new Dictionary<String, Object>
                     {
-                        {"Language", mbr.TextRepresentation?.Language},
-                        {"Script", mbr.TextRepresentation?.Script}
+                        {
+                            "Language", mbr.TextRepresentation?.Language
+                        }
+                        ,
+                        {
+                            "Script", mbr.TextRepresentation?.Script
+                        }
                     }
                 }
             };
