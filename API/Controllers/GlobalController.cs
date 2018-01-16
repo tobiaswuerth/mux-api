@@ -3,14 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using ch.wuerth.tobias.mux.Data;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 
 namespace ch.wuerth.tobias.mux.API.Controllers
 {
     public class GlobalController : DataController
     {
-        public GlobalController(IConfiguration configuration) : base(configuration) { }
-
         [ HttpGet("auth/globals") ]
         public IActionResult Get()
         {

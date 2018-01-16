@@ -12,7 +12,6 @@ using ch.wuerth.tobias.mux.Data;
 using global::ch.wuerth.tobias.mux.Core.global;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace ch.wuerth.tobias.mux.API.Controllers
 {
@@ -41,7 +40,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 .ForEach(x => Directory.CreateDirectory(x));
         }
 
-        protected DataController(IConfiguration configuration)
+        protected DataController()
         {
             _authenticator = new JwtAuthenticator(Config.Authorization.Secret);
         }

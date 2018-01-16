@@ -10,14 +10,11 @@ using ch.wuerth.tobias.mux.Data;
 using ch.wuerth.tobias.mux.Data.models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace ch.wuerth.tobias.mux.API.Controllers
 {
     public class LoginController : DataController
     {
-        public LoginController(IConfiguration configuration) : base(configuration) { }
-
         private IActionResult ProcessPayload(JwtPayload payload)
         {
             // generate token
