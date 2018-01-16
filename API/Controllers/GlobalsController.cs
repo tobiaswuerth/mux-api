@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ch.wuerth.tobias.mux.API.Controllers
 {
-    public class GlobalController : DataController
+    public class GlobalsController : DataController
     {
         [ HttpGet("auth/globals") ]
         public IActionResult Get()

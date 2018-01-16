@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ch.wuerth.tobias.mux.API.Controllers
 {
-    public class LoginController : DataController
+    public class LoginsController : DataController
     {
         private IActionResult ProcessPayload(JwtPayload payload)
         {
