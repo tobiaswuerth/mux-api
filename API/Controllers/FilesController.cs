@@ -17,7 +17,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         {
             try
             {
-                LoggerBundle.Trace("Registered GET request on ArtistsController.Get");
+                LoggerBundle.Trace("Registered GET request on FilesController.Get");
 
                 if (!IsAuthorized(out IActionResult result))
                 {
