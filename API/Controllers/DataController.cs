@@ -27,20 +27,18 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                     , Location.PluginsDirectoryPath
                 }.Where(x => !Directory.Exists(x))
                 .ToList()
-                .ForEach(x => Directory.CreateDirectory(x));
+                .ForEach(x =>
+                {
+                    LoggerBundle.Trace(Logger.DefaultLogFlags & ~LogFlags.SuffixNewLine, $"Trying to create directory '{x}'...");
+                    Directory.CreateDirectory(x);
+                    LoggerBundle.Trace(Logger.DefaultLogFlags & ~LogFlags.PrefixLoggerType & ~LogFlags.PrefixTimeStamp, "Ok.");
+                });
         }
 
         protected DataController()
         {
-            _contextAuthenticatorPipe = new JwtContextAuthenticatorPipe(Config.Authorization.Secret);
-        }
-
-        protected ApiConfig Config
-        {
-            get
-            {
-                return _config ?? (_config = Configurator.Request<ApiConfig>(AuthConfigFilePath));
-            }
+            _config = Configurator.Request<ApiConfig>(AuthConfigFilePath);
+            _contextAuthenticatorPipe = new JwtContextAuthenticatorPipe(_config.Authorization.Secret);
         }
 
         private static String AuthConfigFilePath { get; } =
@@ -50,7 +48,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
 
         protected void NormalizePageSize(ref Int32 pageSize)
         {
-            pageSize = pageSize > Config.ResultMaxPageSize ? Config.ResultMaxPageSize : pageSize < 0 ? 0 : pageSize;
+            pageSize = pageSize > _config.ResultMaxPageSize ? _config.ResultMaxPageSize : pageSize < 0 ? 0 : pageSize;
         }
 
         protected Boolean IsAuthorized(out IActionResult statusCode)
@@ -65,6 +63,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                         => x.UniqueId.Equals(payload.ClientId) && x.Username.ToLower().Equals(payload.Name));
                     if (!found)
                     {
+                        LoggerBundle.Warn($"Got valid payload for user which is not in database: '{payload.Name}'");
                         statusCode = StatusCode((Int32) HttpStatusCode.Unauthorized);
                         return false;
                     }
