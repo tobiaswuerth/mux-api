@@ -76,7 +76,10 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 // get data
                 using (DataContext dc = NewDataContext())
                 {
-                    MusicBrainzArtist artist = dc.SetArtists.AsNoTracking().Include(x => x.MusicBrainzArtistMusicBrainzAliases).ThenInclude(x => x.MusicBrainzAlias).FirstOrDefault(x => x.UniqueId.Equals(id));
+                    MusicBrainzArtist artist = dc.SetArtists.AsNoTracking()
+                        .Include(x => x.MusicBrainzArtistMusicBrainzAliases)
+                        .ThenInclude(x => x.MusicBrainzAlias)
+                        .FirstOrDefault(x => x.UniqueId.Equals(id));
 
                     if (null == artist)
                     {
@@ -94,7 +97,9 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         }
 
         [ HttpGet("auth/artists/{id}/records") ]
-        public IActionResult GetRecordsById(Int32? id, [ FromQuery(Name = "ps") ] Int32 pageSize = 50, [ FromQuery(Name = "p") ] Int32 page = 0)
+        public IActionResult GetRecordsById(Int32? id
+            , [ FromQuery(Name = "ps") ] Int32 pageSize = 50
+            , [ FromQuery(Name = "p") ] Int32 page = 0)
         {
             try
             {
@@ -118,7 +123,12 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 // get data
                 using (DataContext dc = NewDataContext())
                 {
-                    return Ok(dc.SetMusicBrainzRecords.AsNoTracking().FromSql(ArtistQuery.GET_RECORDS_BY_ID, id).Skip(pageSize * page).Take(pageSize).Select(x => x.ToJsonDictionary()).ToList());
+                    return Ok(dc.SetMusicBrainzRecords.AsNoTracking()
+                        .FromSql(ArtistQuery.GET_RECORDS_BY_ID, id)
+                        .Skip(pageSize * page)
+                        .Take(pageSize)
+                        .Select(x => x.ToJsonDictionary())
+                        .ToList());
                 }
             }
             catch (Exception ex)
@@ -128,7 +138,9 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         }
 
         [ HttpGet("auth/artists/{id}/releases") ]
-        public IActionResult GetReleasesById(Int32? id, [ FromQuery(Name = "ps") ] Int32 pageSize = 50, [ FromQuery(Name = "p") ] Int32 page = 0)
+        public IActionResult GetReleasesById(Int32? id
+            , [ FromQuery(Name = "ps") ] Int32 pageSize = 50
+            , [ FromQuery(Name = "p") ] Int32 page = 0)
         {
             try
             {
@@ -152,7 +164,13 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 // get data
                 using (DataContext dc = NewDataContext())
                 {
-                    return Ok(dc.SetReleases.AsNoTracking().FromSql(ArtistQuery.GET_RELEASES_BY_ID, id).Include(x => x.TextRepresentation).Skip(pageSize * page).Take(pageSize).Select(x => x.ToJsonDictionary()).ToList());
+                    return Ok(dc.SetReleases.AsNoTracking()
+                        .FromSql(ArtistQuery.GET_RELEASES_BY_ID, id)
+                        .Include(x => x.TextRepresentation)
+                        .Skip(pageSize * page)
+                        .Take(pageSize)
+                        .Select(x => x.ToJsonDictionary())
+                        .ToList());
                 }
             }
             catch (Exception ex)
@@ -162,7 +180,9 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         }
 
         [ HttpGet("auth/artists/search/{query}") ]
-        public IActionResult GetBySearchQuery(String query, [ FromQuery(Name = "ps") ] Int32 pageSize = 50, [ FromQuery(Name = "p") ] Int32 page = 0)
+        public IActionResult GetBySearchQuery(String query
+            , [ FromQuery(Name = "ps") ] Int32 pageSize = 50
+            , [ FromQuery(Name = "p") ] Int32 page = 0)
         {
             try
             {
@@ -210,7 +230,9 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         }
 
         [ HttpGet("auth/artists/lookup/{query}") ]
-        public IActionResult GetByLookupQuery(String query, [ FromQuery(Name = "ps") ] Int32 pageSize = 50, [ FromQuery(Name = "p") ] Int32 page = 0)
+        public IActionResult GetByLookupQuery(String query
+            , [ FromQuery(Name = "ps") ] Int32 pageSize = 50
+            , [ FromQuery(Name = "p") ] Int32 page = 0)
         {
             try
             {
@@ -235,7 +257,14 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 // get data
                 using (DataContext dc = NewDataContext())
                 {
-                    return Ok(dc.SetArtists.AsNoTracking().Where(x => x.Name.Equals(query)).Skip(page * pageSize).Include(x => x.MusicBrainzArtistMusicBrainzAliases).ThenInclude(x => x.MusicBrainzAlias).Take(pageSize).Select(x => x.ToJsonDictionary()).ToList());
+                    return Ok(dc.SetArtists.AsNoTracking()
+                        .Where(x => x.Name.Equals(query))
+                        .Skip(page * pageSize)
+                        .Include(x => x.MusicBrainzArtistMusicBrainzAliases)
+                        .ThenInclude(x => x.MusicBrainzAlias)
+                        .Take(pageSize)
+                        .Select(x => x.ToJsonDictionary())
+                        .ToList());
                 }
             }
             catch (Exception ex)

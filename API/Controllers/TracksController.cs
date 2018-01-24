@@ -27,7 +27,11 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 // get data
                 using (DataContext dc = NewDataContext())
                 {
-                    return Ok(dc.SetTracks.AsNoTracking().Skip(page * pageSize).Take(pageSize).Select(x => x.ToJsonDictionary()).ToList());
+                    return Ok(dc.SetTracks.AsNoTracking()
+                        .Skip(page * pageSize)
+                        .Take(pageSize)
+                        .Select(x => x.ToJsonDictionary())
+                        .ToList());
                 }
             }
             catch (Exception ex)
@@ -91,7 +95,12 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 // get data
                 using (DataContext dc = NewDataContext())
                 {
-                    Track track = dc.SetTracks.AsNoTracking().Include(x => x.AcoustIdResults).ThenInclude(x => x.AcoustId).ThenInclude(x => x.MusicBrainzRecordAcoustIds).ThenInclude(x => x.MusicBrainzRecord).FirstOrDefault(x => x.UniqueId.Equals(id));
+                    Track track = dc.SetTracks.AsNoTracking()
+                        .Include(x => x.AcoustIdResults)
+                        .ThenInclude(x => x.AcoustId)
+                        .ThenInclude(x => x.MusicBrainzRecordAcoustIds)
+                        .ThenInclude(x => x.MusicBrainzRecord)
+                        .FirstOrDefault(x => x.UniqueId.Equals(id));
 
                     if (null == track)
                     {
@@ -102,7 +111,8 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                     // todo might need optimization with a direct database sql query
 
                     // loop references and keep track of relevant stats
-                    Dictionary<MusicBrainzRecord, (Int32 count, Double sum)> ret = new Dictionary<MusicBrainzRecord, (Int32, Double)>();
+                    Dictionary<MusicBrainzRecord, (Int32 count, Double sum)> ret =
+                        new Dictionary<MusicBrainzRecord, (Int32, Double)>();
 
                     track.AcoustIdResults.ForEach(x =>
                     {

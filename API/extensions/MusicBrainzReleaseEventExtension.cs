@@ -39,16 +39,17 @@ namespace ch.wuerth.tobias.mux.API.extensions
                         }
                         ,
                         {
-                            "IsoCodes", revent.Area?.MusicBrainzIsoCodeMusicBrainzAreas.Select(x => new Dictionary<String, Object>
-                            {
+                            "IsoCodes", revent.Area?.MusicBrainzIsoCodeMusicBrainzAreas.Select(x
+                                => new Dictionary<String, Object>
                                 {
-                                    "UniqueId", x.MusicBrainzIsoCode.UniqueId
-                                }
-                                ,
-                                {
-                                    "Code", x.MusicBrainzIsoCode.Code
-                                }
-                            })
+                                    {
+                                        "UniqueId", x.MusicBrainzIsoCode.UniqueId
+                                    }
+                                    ,
+                                    {
+                                        "Code", x.MusicBrainzIsoCode.Code
+                                    }
+                                })
                         }
                     }
                 }
