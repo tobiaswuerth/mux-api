@@ -15,7 +15,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
     public abstract class DataController : Controller
     {
         private readonly JwtContextAuthenticatorPipe _contextAuthenticatorPipe;
-        
+
         private ApiConfig _config;
 
         static DataController()
@@ -43,7 +43,8 @@ namespace ch.wuerth.tobias.mux.API.Controllers
             }
         }
 
-        private static String AuthConfigFilePath { get; } = Path.Combine(Location.ApplicationDataDirectoryPath, "mux_config_auth");
+        private static String AuthConfigFilePath { get; } =
+            Path.Combine(Location.ApplicationDataDirectoryPath, "mux_config_auth");
 
         protected JwtPayload AuthorizedPayload { get; private set; }
 
@@ -54,21 +55,31 @@ namespace ch.wuerth.tobias.mux.API.Controllers
 
         protected Boolean IsAuthorized(out IActionResult statusCode)
         {
-            JwtPayload payload = _contextAuthenticatorPipe.Process(HttpContext);
-
-            using (DataContext context = NewDataContext())
+            try
             {
-                Boolean found = context.SetUsers.Any(x => x.UniqueId.Equals(payload.ClientId) && x.Username.ToLower().Equals(payload.Name));
-                if (!found)
-                {
-                    statusCode = StatusCode((Int32) HttpStatusCode.Unauthorized);
-                    return false;
-                }
-            }
+                JwtPayload payload = _contextAuthenticatorPipe.Process(HttpContext);
 
-            statusCode = null;
-            AuthorizedPayload = payload;
-            return true;
+                using (DataContext context = NewDataContext())
+                {
+                    Boolean found = context.SetUsers.Any(x
+                        => x.UniqueId.Equals(payload.ClientId) && x.Username.ToLower().Equals(payload.Name));
+                    if (!found)
+                    {
+                        statusCode = StatusCode((Int32) HttpStatusCode.Unauthorized);
+                        return false;
+                    }
+                }
+
+                statusCode = null;
+                AuthorizedPayload = payload;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LoggerBundle.Trace(ex);
+                statusCode = StatusCode((Int32) HttpStatusCode.Unauthorized);
+                return false;
+            }
         }
 
         protected IActionResult HandleException(Exception ex)

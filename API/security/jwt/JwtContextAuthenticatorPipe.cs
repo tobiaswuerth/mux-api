@@ -31,7 +31,7 @@ namespace ch.wuerth.tobias.mux.API.security.jwt
             String headerKeyAuth = HttpRequestHeader.Authorization.ToString();
             if (!headers.ContainsKey(headerKeyAuth))
             {
-                throw new ArgumentNullException(nameof(headers));
+                throw new ArgumentNullException(nameof(headerKeyAuth));
             }
 
             // get header and validate content
@@ -73,7 +73,7 @@ namespace ch.wuerth.tobias.mux.API.security.jwt
                 throw new FormatException("decoded json empty");
             }
 
-            // deserializer json
+            // deserialize json
             JwtPayload payload = serializer.Deserialize<JwtPayload>(json);
 
             // validate
