@@ -9,11 +9,11 @@ using Microsoft.Extensions.Primitives;
 
 namespace ch.wuerth.tobias.mux.API.security.jwt
 {
-    public class JwtAuthenticator : ProcessPipe<HttpContext, JwtPayload>
+    public class JwtContextAuthenticatorPipe : ProcessPipe<HttpContext, JwtPayload>
     {
         private const String BEARER_PREFIX = "Bearer ";
 
-        public JwtAuthenticator(String secret) : base(o =>
+        public JwtContextAuthenticatorPipe(String secret) : base(o =>
         {
             if (o == null)
             {

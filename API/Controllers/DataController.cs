@@ -14,7 +14,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
 {
     public abstract class DataController : Controller
     {
-        private readonly JwtAuthenticator _authenticator;
+        private readonly JwtContextAuthenticatorPipe _contextAuthenticatorPipe;
         
         private ApiConfig _config;
 
@@ -32,7 +32,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
 
         protected DataController()
         {
-            _authenticator = new JwtAuthenticator(Config.Authorization.Secret);
+            _contextAuthenticatorPipe = new JwtContextAuthenticatorPipe(Config.Authorization.Secret);
         }
 
         protected ApiConfig Config
@@ -54,12 +54,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
 
         protected Boolean IsAuthorized(out IActionResult statusCode)
         {
-            (JwtPayload payload, Boolean success) = _authenticator.Handle(HttpContext);
-            if (!success)
-            {
-                statusCode = StatusCode((Int32) HttpStatusCode.Unauthorized);
-                return false;
-            }
+            JwtPayload payload = _contextAuthenticatorPipe.Process(HttpContext);
 
             using (DataContext context = NewDataContext())
             {
