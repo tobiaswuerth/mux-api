@@ -78,6 +78,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
 
         protected IActionResult HandleException(Exception ex)
         {
+            LoggerBundle.Error(ex);
             return StatusCode((Int32) HttpStatusCode.InternalServerError);
         }
 

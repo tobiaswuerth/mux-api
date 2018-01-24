@@ -15,6 +15,8 @@ namespace ch.wuerth.tobias.mux.API.Controllers
 {
     public class LoginsController : DataController
     {
+        private static readonly UserJwtPayloadPipe UserJwtPayloadPipe = new UserJwtPayloadPipe();
+
         private IActionResult ProcessPayload(JwtPayload payload)
         {
             // generate token
@@ -74,9 +76,8 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 }
 
                 // prepare token generation
-                (JwtPayload output, Boolean success) jp = new JwtPayloadProcessor().Handle(user);
-
-                return !jp.success ? StatusCode((Int32) HttpStatusCode.InternalServerError) : ProcessPayload(jp.output);
+                JwtPayload payload = UserJwtPayloadPipe.Process(user);
+                return ProcessPayload(payload);
             }
             catch (Exception ex)
             {

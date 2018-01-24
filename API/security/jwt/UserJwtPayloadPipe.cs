@@ -4,9 +4,9 @@ using ch.wuerth.tobias.ProcessPipeline;
 
 namespace ch.wuerth.tobias.mux.API.security.jwt
 {
-    public class JwtPayloadProcessor : ProcessPipe<User, JwtPayload>
+    public class UserJwtPayloadPipe : ProcessPipe<User, JwtPayload>
     {
-        public JwtPayloadProcessor() : base(o =>
+        public UserJwtPayloadPipe() : base(o =>
         {
             if (o == null)
             {
