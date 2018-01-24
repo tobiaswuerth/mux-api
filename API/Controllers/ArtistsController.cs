@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using ch.wuerth.tobias.mux.API.Controllers.queries;
 using ch.wuerth.tobias.mux.API.extensions;
+using ch.wuerth.tobias.mux.Core.logging;
 using ch.wuerth.tobias.mux.Data;
 using ch.wuerth.tobias.mux.Data.models;
 using Microsoft.AspNetCore.Mvc;
@@ -18,8 +19,11 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         {
             try
             {
+                LoggerBundle.Trace("Registered GET request on ArtistsController.GetAll");
+
                 if (!IsAuthorized(out IActionResult result))
                 {
+                    LoggerBundle.Trace("Request not authorized");
                     return result;
                 }
 
@@ -54,14 +58,18 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         {
             try
             {
+                LoggerBundle.Trace("Registered GET request on ArtistsController.GetById");
+
                 if (!IsAuthorized(out IActionResult result))
                 {
+                    LoggerBundle.Trace("Request not authorized");
                     return result;
                 }
 
                 // validate
                 if (id == null)
                 {
+                    LoggerBundle.Trace("Validation failed: id is null");
                     return StatusCode((Int32) HttpStatusCode.BadRequest);
                 }
 
@@ -72,7 +80,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
 
                     if (null == artist)
                     {
-                        // no matching record found
+                        LoggerBundle.Trace($"No artist found for given id '{id}'");
                         return StatusCode((Int32) HttpStatusCode.NotFound);
                     }
 
@@ -90,14 +98,18 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         {
             try
             {
+                LoggerBundle.Trace("Registered GET request on ArtistsController.GetRecordsById");
+
                 if (!IsAuthorized(out IActionResult result))
                 {
+                    LoggerBundle.Trace("Request not authorized");
                     return result;
                 }
 
                 // validate
                 if (id == null)
                 {
+                    LoggerBundle.Trace("Validation failed: id is null");
                     return StatusCode((Int32) HttpStatusCode.BadRequest);
                 }
 
@@ -120,14 +132,18 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         {
             try
             {
+                LoggerBundle.Trace("Registered GET request on ArtistsController.GetReleasesById");
+
                 if (!IsAuthorized(out IActionResult result))
                 {
+                    LoggerBundle.Trace("Request not authorized");
                     return result;
                 }
 
                 // validate
                 if (id == null)
                 {
+                    LoggerBundle.Trace("Validation failed: id is null");
                     return StatusCode((Int32) HttpStatusCode.BadRequest);
                 }
 
@@ -150,14 +166,18 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         {
             try
             {
+                LoggerBundle.Trace("Registered GET request on ArtistsController.GetBySearchQuery");
+
                 if (!IsAuthorized(out IActionResult result))
                 {
+                    LoggerBundle.Trace("Request not authorized");
                     return result;
                 }
 
                 // validate
                 if (String.IsNullOrWhiteSpace(query))
                 {
+                    LoggerBundle.Trace("Validation failed: empty query");
                     return StatusCode((Int32) HttpStatusCode.BadRequest);
                 }
 
@@ -194,14 +214,18 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         {
             try
             {
+                LoggerBundle.Trace("Registered GET request on ArtistsController.GetByLookupQuery");
+
                 if (!IsAuthorized(out IActionResult result))
                 {
+                    LoggerBundle.Trace("Request not authorized");
                     return result;
                 }
 
                 // validate
                 if (String.IsNullOrWhiteSpace(query))
                 {
+                    LoggerBundle.Trace("Validation failed: empty query");
                     return StatusCode((Int32) HttpStatusCode.BadRequest);
                 }
 
