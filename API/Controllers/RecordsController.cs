@@ -165,7 +165,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 NormalizePageSize(ref pageSize);
 
                 // get data
-                using (DataContext dc = new DataContext(new DbContextOptions<DataContext>(), Logger))
+                using (DataContext dc = NewDataContext())
                 {
                     return Ok(dc.SetArtistCredits.AsNoTracking().FromSql(RecordQuery.GET_ARTISTS_BY_ID, id).Include(x => x.Artist).ThenInclude(x => x.MusicBrainzArtistMusicBrainzAliases).ThenInclude(x => x.MusicBrainzAlias).Skip(page * pageSize).Take(pageSize).Select(x => x.ToJsonDictionary()).ToList());
                 }
@@ -195,7 +195,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 NormalizePageSize(ref pageSize);
 
                 // get data
-                using (DataContext dc = new DataContext(new DbContextOptions<DataContext>(), Logger))
+                using (DataContext dc = NewDataContext())
                 {
                     return Ok(dc.SetAliases.AsNoTracking().FromSql(RecordQuery.GET_ALIASES_BY_ID, id).Skip(page * pageSize).Take(pageSize).Select(x => x.ToJsonDictionary()).ToList());
                 }

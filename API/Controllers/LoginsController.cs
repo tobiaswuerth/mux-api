@@ -5,7 +5,7 @@ using System.Linq;
 using System.Net;
 using ch.wuerth.tobias.mux.API.security;
 using ch.wuerth.tobias.mux.API.security.jwt;
-using ch.wuerth.tobias.mux.Core.processor;
+using ch.wuerth.tobias.mux.Core.processing;
 using ch.wuerth.tobias.mux.Data;
 using ch.wuerth.tobias.mux.Data.models;
 using Microsoft.AspNetCore.Mvc;
@@ -49,12 +49,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 }
 
                 // hash password
-                (String output, Boolean success) pp = new PasswordProcessor().Handle(values.Password, Logger);
-
-                if (!pp.success)
-                {
-                    return StatusCode((Int32) HttpStatusCode.InternalServerError);
-                }
+                values.Password = new Sha512HashPipe().Process(values.Password);
 
                 // normalize username
                 values.Username = values.Username.Trim();
@@ -72,14 +67,14 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                     return StatusCode((Int32) HttpStatusCode.Unauthorized);
                 }
 
-                if (!user.Password.Equals(pp.output))
+                if (!user.Password.Equals(values.Password))
                 {
                     // password incorrect
                     return StatusCode((Int32) HttpStatusCode.Unauthorized);
                 }
 
                 // prepare token generation
-                (JwtPayload output, Boolean success) jp = new JwtPayloadProcessor().Handle(user, Logger);
+                (JwtPayload output, Boolean success) jp = new JwtPayloadProcessor().Handle(user);
 
                 return !jp.success ? StatusCode((Int32) HttpStatusCode.InternalServerError) : ProcessPayload(jp.output);
             }

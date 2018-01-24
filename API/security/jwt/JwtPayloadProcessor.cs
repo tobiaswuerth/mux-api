@@ -1,25 +1,23 @@
 using System;
-using ch.wuerth.tobias.mux.Core.logging;
-using ch.wuerth.tobias.mux.Core.processor;
 using ch.wuerth.tobias.mux.Data.models;
+using ch.wuerth.tobias.ProcessPipeline;
 
 namespace ch.wuerth.tobias.mux.API.security.jwt
 {
-    public class JwtPayloadProcessor : IProcessor<User, JwtPayload>
+    public class JwtPayloadProcessor : ProcessPipe<User, JwtPayload>
     {
-        public (JwtPayload output, Boolean success) Handle(User input, LoggerBundle logger)
+        public JwtPayloadProcessor() : base(o =>
         {
-            if (input != null)
+            if (o == null)
             {
-                return (new JwtPayload
-                {
-                    Name = input.Username
-                    , ClientId = input.UniqueId
-                }, true);
+                throw new ArgumentNullException(nameof(o));
             }
 
-            logger?.Exception?.Log(new ArgumentNullException(nameof(input)));
-            return (null, false);
-        }
+            return new JwtPayload
+            {
+                Name = o.Username
+                , ClientId = o.UniqueId
+            };
+        }) { }
     }
 }
