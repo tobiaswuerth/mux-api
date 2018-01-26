@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using ch.wuerth.tobias.mux.API.Controllers.queries;
 using ch.wuerth.tobias.mux.API.extensions;
+using ch.wuerth.tobias.mux.Core.logging;
 using ch.wuerth.tobias.mux.Data;
 using ch.wuerth.tobias.mux.Data.models;
 using Microsoft.AspNetCore.Mvc;
@@ -18,8 +19,10 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         {
             try
             {
+                LoggerBundle.Trace("Registered GET request on RecordsController.GetAll");
                 if (!IsAuthorized(out IActionResult result))
                 {
+                    LoggerBundle.Trace("Request not authorized");
                     return result;
                 }
 
@@ -55,14 +58,17 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         {
             try
             {
+                LoggerBundle.Trace("Registered GET request on RecordsController.GetById");
                 if (!IsAuthorized(out IActionResult result))
                 {
+                    LoggerBundle.Trace("Request not authorized");
                     return result;
                 }
 
                 // validate
                 if (id == null)
                 {
+                    LoggerBundle.Trace("Validation failed: id is null");
                     return StatusCode((Int32) HttpStatusCode.BadRequest);
                 }
 
@@ -74,6 +80,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
 
                     if (null == record)
                     {
+                        LoggerBundle.Trace($"No record found for given id '{id}'");
                         // no matching record found
                         return StatusCode((Int32) HttpStatusCode.NotFound);
                     }
@@ -94,14 +101,17 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         {
             try
             {
+                LoggerBundle.Trace("Registered GET request on RecordsController.GetTracksById");
                 if (!IsAuthorized(out IActionResult result))
                 {
+                    LoggerBundle.Trace("Request not authorized");
                     return result;
                 }
 
                 // validate
                 if (id == null)
                 {
+                    LoggerBundle.Trace("Validation failed: id is null");
                     return StatusCode((Int32) HttpStatusCode.BadRequest);
                 }
 
@@ -133,14 +143,17 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         {
             try
             {
+                LoggerBundle.Trace("Registered GET request on RecordsController.GetReleasesById");
                 if (!IsAuthorized(out IActionResult result))
                 {
+                    LoggerBundle.Trace("Request not authorized");
                     return result;
                 }
 
                 // validate
                 if (id == null)
                 {
+                    LoggerBundle.Trace("Validation failed: id is null");
                     return StatusCode((Int32) HttpStatusCode.BadRequest);
                 }
 
@@ -171,14 +184,17 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         {
             try
             {
+                LoggerBundle.Trace("Registered GET request on RecordsController.GetArtistsById");
                 if (!IsAuthorized(out IActionResult result))
                 {
+                    LoggerBundle.Trace("Request not authorized");
                     return result;
                 }
 
                 // validate
                 if (id == null)
                 {
+                    LoggerBundle.Trace("Validation failed: id is null");
                     return StatusCode((Int32) HttpStatusCode.BadRequest);
                 }
 
@@ -211,14 +227,17 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         {
             try
             {
+                LoggerBundle.Trace("Registered GET request on RecordsController.GetAliasesById");
                 if (!IsAuthorized(out IActionResult result))
                 {
+                    LoggerBundle.Trace("Request not authorized");
                     return result;
                 }
 
                 // validate
                 if (id == null)
                 {
+                    LoggerBundle.Trace("Validation failed: id is null");
                     return StatusCode((Int32) HttpStatusCode.BadRequest);
                 }
 
@@ -248,14 +267,17 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         {
             try
             {
+                LoggerBundle.Trace("Registered GET request on RecordsController.GetBySearchQuery");
                 if (!IsAuthorized(out IActionResult result))
                 {
+                    LoggerBundle.Trace("Request not authorized");
                     return result;
                 }
 
                 // validate
                 if (String.IsNullOrWhiteSpace(query))
                 {
+                    LoggerBundle.Trace("Validation failed: empty query");
                     return StatusCode((Int32) HttpStatusCode.BadRequest);
                 }
 
@@ -295,14 +317,17 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         {
             try
             {
+                LoggerBundle.Trace("Registered GET request on RecordsController.GetByLookupQuery");
                 if (!IsAuthorized(out IActionResult result))
                 {
+                    LoggerBundle.Trace("Request not authorized");
                     return result;
                 }
 
                 // verify
                 if (String.IsNullOrWhiteSpace(query))
                 {
+                    LoggerBundle.Trace("Validation failed: empty query");
                     return StatusCode((Int32) HttpStatusCode.BadRequest);
                 }
 

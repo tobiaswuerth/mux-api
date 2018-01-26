@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using ch.wuerth.tobias.mux.API.security;
 using ch.wuerth.tobias.mux.API.security.jwt;
+using ch.wuerth.tobias.mux.Core.logging;
 using ch.wuerth.tobias.mux.Core.processing;
 using ch.wuerth.tobias.mux.Data;
 using ch.wuerth.tobias.mux.Data.models;
@@ -24,6 +25,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
 
             if (String.IsNullOrWhiteSpace(token))
             {
+                LoggerBundle.Warn("JWT token generation failed: empty token");
                 return StatusCode((Int32) HttpStatusCode.InternalServerError);
             }
 
@@ -44,9 +46,12 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         {
             try
             {
+                LoggerBundle.Trace("Registered POST request on LoginsController.Login");
+
                 //validate data
                 if (String.IsNullOrWhiteSpace(values?.Password) || String.IsNullOrWhiteSpace(values.Username))
                 {
+                    LoggerBundle.Trace("Validation failed: empty username or password");
                     return StatusCode((Int32) HttpStatusCode.Unauthorized);
                 }
 
@@ -65,13 +70,13 @@ namespace ch.wuerth.tobias.mux.API.Controllers
 
                 if (null == user)
                 {
-                    // no user found with given username
+                    LoggerBundle.Trace($"No user found for given username '{values.Username}'");
                     return StatusCode((Int32) HttpStatusCode.Unauthorized);
                 }
 
                 if (!user.Password.Equals(values.Password))
                 {
-                    // password incorrect
+                    LoggerBundle.Trace($"Login attempt for user '{user.Username}' failed");
                     return StatusCode((Int32) HttpStatusCode.Unauthorized);
                 }
 
@@ -90,7 +95,14 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         {
             try
             {
-                return !IsAuthorized(out IActionResult statusCode) ? statusCode : ProcessPayload(AuthorizedPayload);
+                LoggerBundle.Trace("Registered GET request on LoginController.RefreshToken");
+                if (IsAuthorized(out IActionResult statusCode))
+                {
+                    return ProcessPayload(AuthorizedPayload);
+                }
+
+                LoggerBundle.Trace("Request not authorized");
+                return statusCode;
             }
             catch (Exception ex)
             {
