@@ -16,8 +16,6 @@ namespace ch.wuerth.tobias.mux.API.Controllers
     {
         private readonly JwtContextAuthenticatorPipe _contextAuthenticatorPipe;
 
-        protected ApiConfig Config { get; }
-
         static DataController()
         {
             new List<String>
@@ -29,7 +27,8 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 .ToList()
                 .ForEach(x =>
                 {
-                    LoggerBundle.Trace(Logger.DefaultLogFlags & ~LogFlags.SuffixNewLine, $"Trying to create directory '{x}'...");
+                    LoggerBundle.Trace(Logger.DefaultLogFlags & ~LogFlags.SuffixNewLine
+                        , $"Trying to create directory '{x}'...");
                     Directory.CreateDirectory(x);
                     LoggerBundle.Trace(Logger.DefaultLogFlags & ~LogFlags.PrefixLoggerType & ~LogFlags.PrefixTimeStamp, "Ok.");
                 });
@@ -40,6 +39,8 @@ namespace ch.wuerth.tobias.mux.API.Controllers
             Config = Configurator.Request<ApiConfig>(AuthConfigFilePath);
             _contextAuthenticatorPipe = new JwtContextAuthenticatorPipe(Config.Authorization.Secret);
         }
+
+        protected ApiConfig Config { get; }
 
         private static String AuthConfigFilePath { get; } =
             Path.Combine(Location.ApplicationDataDirectoryPath, "mux_config_auth");

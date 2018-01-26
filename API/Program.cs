@@ -1,4 +1,5 @@
 ﻿using System;
+using ch.wuerth.tobias.mux.Core.logging;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 
@@ -8,6 +9,7 @@ namespace ch.wuerth.tobias.mux.API
     {
         public static void Main(String[] args)
         {
+            LoggerBundle.Trace("Starting...");
             BuildWebHost(args).Run();
         }
 

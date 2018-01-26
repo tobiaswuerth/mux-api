@@ -16,6 +16,7 @@ namespace ch.wuerth.tobias.mux.API.security.jwt
                 LoggerBundle.Trace("Validation failed: payload is null");
                 throw new ArgumentNullException(nameof(payload));
             }
+
             if (secret == null)
             {
                 LoggerBundle.Trace("Validation failed: secret is null");
