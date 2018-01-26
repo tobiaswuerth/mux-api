@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using ch.wuerth.tobias.mux.API.Controllers.queries;
 using ch.wuerth.tobias.mux.API.extensions;
+using ch.wuerth.tobias.mux.Core.logging;
 using ch.wuerth.tobias.mux.Data;
 using ch.wuerth.tobias.mux.Data.models;
 using Microsoft.AspNetCore.Mvc;
@@ -18,8 +19,10 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         {
             try
             {
+                LoggerBundle.Trace("Registered GET request on ReleasesController.GetAll");
                 if (!IsAuthorized(out IActionResult result))
                 {
+                    LoggerBundle.Trace("Request not authorized");
                     return result;
                 }
 
@@ -55,25 +58,30 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         {
             try
             {
+                LoggerBundle.Trace("Registered GET request on ReleasesController.GetById");
                 if (!IsAuthorized(out IActionResult result))
                 {
+                    LoggerBundle.Trace("Request not authorized");
                     return result;
                 }
 
                 // validate
                 if (id == null)
                 {
+                    LoggerBundle.Trace("Validation failed: id is null");
                     return StatusCode((Int32) HttpStatusCode.BadRequest);
                 }
 
                 // get data
                 using (DataContext dc = NewDataContext())
                 {
-                    MusicBrainzRelease release = dc.SetReleases.AsNoTracking().Include(x => x.TextRepresentation).FirstOrDefault(x => x.UniqueId.Equals(id));
+                    MusicBrainzRelease release = dc.SetReleases.AsNoTracking()
+                        .Include(x => x.TextRepresentation)
+                        .FirstOrDefault(x => x.UniqueId.Equals(id));
 
                     if (null == release)
                     {
-                        // no matching record found
+                        LoggerBundle.Trace($"No release found for given id '{id}'");
                         return StatusCode((Int32) HttpStatusCode.NotFound);
                     }
 
@@ -87,18 +95,23 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         }
 
         [ HttpGet("auth/releases/{id}/records") ]
-        public IActionResult GetRecordsById(Int32? id, [ FromQuery(Name = "ps") ] Int32 pageSize = 50, [ FromQuery(Name = "p") ] Int32 page = 0)
+        public IActionResult GetRecordsById(Int32? id
+            , [ FromQuery(Name = "ps") ] Int32 pageSize = 50
+            , [ FromQuery(Name = "p") ] Int32 page = 0)
         {
             try
             {
+                LoggerBundle.Trace("Registered GET request on ReleasesController.GetRecordsById");
                 if (!IsAuthorized(out IActionResult result))
                 {
+                    LoggerBundle.Trace("Request not authorized");
                     return result;
                 }
 
                 // validate
                 if (id == null)
                 {
+                    LoggerBundle.Trace("Validation failed: id is null");
                     return StatusCode((Int32) HttpStatusCode.BadRequest);
                 }
 
@@ -107,7 +120,12 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 // get data
                 using (DataContext dc = NewDataContext())
                 {
-                    return Ok(dc.SetMusicBrainzRecords.AsNoTracking().FromSql(ReleaseQuery.GET_RECORDS_BY_ID, id).Skip(pageSize * page).Take(pageSize).Select(x => x.ToJsonDictionary()).ToList());
+                    return Ok(dc.SetMusicBrainzRecords.AsNoTracking()
+                        .FromSql(ReleaseQuery.GET_RECORDS_BY_ID, id)
+                        .Skip(pageSize * page)
+                        .Take(pageSize)
+                        .Select(x => x.ToJsonDictionary())
+                        .ToList());
                 }
             }
             catch (Exception ex)
@@ -117,18 +135,23 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         }
 
         [ HttpGet("auth/releases/{id}/artists") ]
-        public IActionResult GetArtistsById(Int32? id, [ FromQuery(Name = "ps") ] Int32 pageSize = 50, [ FromQuery(Name = "p") ] Int32 page = 0)
+        public IActionResult GetArtistsById(Int32? id
+            , [ FromQuery(Name = "ps") ] Int32 pageSize = 50
+            , [ FromQuery(Name = "p") ] Int32 page = 0)
         {
             try
             {
+                LoggerBundle.Trace("Registered GET request on ReleasesController.GetArtistsById");
                 if (!IsAuthorized(out IActionResult result))
                 {
+                    LoggerBundle.Trace("Request not authorized");
                     return result;
                 }
 
                 // validate
                 if (id == null)
                 {
+                    LoggerBundle.Trace("Validation failed: id is null");
                     return StatusCode((Int32) HttpStatusCode.BadRequest);
                 }
 
@@ -137,7 +160,15 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 // get data
                 using (DataContext dc = NewDataContext())
                 {
-                    return Ok(dc.SetArtistCredits.AsNoTracking().FromSql(ReleaseQuery.GET_ARTISTS_BY_ID, id).Include(x => x.Artist).ThenInclude(x => x.MusicBrainzArtistMusicBrainzAliases).ThenInclude(x => x.MusicBrainzAlias).Skip(page * pageSize).Take(pageSize).Select(x => x.ToJsonDictionary()).ToList());
+                    return Ok(dc.SetArtistCredits.AsNoTracking()
+                        .FromSql(ReleaseQuery.GET_ARTISTS_BY_ID, id)
+                        .Include(x => x.Artist)
+                        .ThenInclude(x => x.MusicBrainzArtistMusicBrainzAliases)
+                        .ThenInclude(x => x.MusicBrainzAlias)
+                        .Skip(page * pageSize)
+                        .Take(pageSize)
+                        .Select(x => x.ToJsonDictionary())
+                        .ToList());
                 }
             }
             catch (Exception ex)
@@ -147,18 +178,23 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         }
 
         [ HttpGet("auth/releases/{id}/aliases") ]
-        public IActionResult GetAliasesById(Int32? id, [ FromQuery(Name = "ps") ] Int32 pageSize = 50, [ FromQuery(Name = "p") ] Int32 page = 0)
+        public IActionResult GetAliasesById(Int32? id
+            , [ FromQuery(Name = "ps") ] Int32 pageSize = 50
+            , [ FromQuery(Name = "p") ] Int32 page = 0)
         {
             try
             {
+                LoggerBundle.Trace("Registered GET request on ReleasesController.GetAliasesById");
                 if (!IsAuthorized(out IActionResult result))
                 {
+                    LoggerBundle.Trace("Request not authorized");
                     return result;
                 }
 
                 // validate
                 if (id == null)
                 {
+                    LoggerBundle.Trace("Validation failed: id is null");
                     return StatusCode((Int32) HttpStatusCode.BadRequest);
                 }
 
@@ -167,7 +203,12 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 // get data
                 using (DataContext dc = NewDataContext())
                 {
-                    return Ok(dc.SetAliases.AsNoTracking().FromSql(ReleaseQuery.GET_ALIASES_BY_ID, id).Skip(page * pageSize).Take(pageSize).Select(x => x.ToJsonDictionary()).ToList());
+                    return Ok(dc.SetAliases.AsNoTracking()
+                        .FromSql(ReleaseQuery.GET_ALIASES_BY_ID, id)
+                        .Skip(page * pageSize)
+                        .Take(pageSize)
+                        .Select(x => x.ToJsonDictionary())
+                        .ToList());
                 }
             }
             catch (Exception ex)
@@ -177,18 +218,23 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         }
 
         [ HttpGet("auth/releases/{id}/events") ]
-        public IActionResult GetEventsById(Int32? id, [ FromQuery(Name = "ps") ] Int32 pageSize = 50, [ FromQuery(Name = "p") ] Int32 page = 0)
+        public IActionResult GetEventsById(Int32? id
+            , [ FromQuery(Name = "ps") ] Int32 pageSize = 50
+            , [ FromQuery(Name = "p") ] Int32 page = 0)
         {
             try
             {
+                LoggerBundle.Trace("Registered GET request on ReleasesController.GetEventsById");
                 if (!IsAuthorized(out IActionResult result))
                 {
+                    LoggerBundle.Trace("Request not authorized");
                     return result;
                 }
 
                 // validate
                 if (id == null)
                 {
+                    LoggerBundle.Trace("Validation failed: id is null");
                     return StatusCode((Int32) HttpStatusCode.BadRequest);
                 }
 
@@ -197,7 +243,15 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 // get data
                 using (DataContext dc = NewDataContext())
                 {
-                    return Ok(dc.SetReleaseEvents.AsNoTracking().FromSql(ReleaseQuery.GET_RELEASE_EVENTS_BY_ID, id).Include(x => x.Area).ThenInclude(x => x.MusicBrainzIsoCodeMusicBrainzAreas).ThenInclude(x => x.MusicBrainzIsoCode).Skip(page * pageSize).Take(pageSize).Select(x => x.ToJsonDictionary()).ToList());
+                    return Ok(dc.SetReleaseEvents.AsNoTracking()
+                        .FromSql(ReleaseQuery.GET_RELEASE_EVENTS_BY_ID, id)
+                        .Include(x => x.Area)
+                        .ThenInclude(x => x.MusicBrainzIsoCodeMusicBrainzAreas)
+                        .ThenInclude(x => x.MusicBrainzIsoCode)
+                        .Skip(page * pageSize)
+                        .Take(pageSize)
+                        .Select(x => x.ToJsonDictionary())
+                        .ToList());
                 }
             }
             catch (Exception ex)
@@ -207,18 +261,23 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         }
 
         [ HttpGet("auth/releases/search/{query}") ]
-        public IActionResult GetBySearchQuery(String query, [ FromQuery(Name = "ps") ] Int32 pageSize = 50, [ FromQuery(Name = "p") ] Int32 page = 0)
+        public IActionResult GetBySearchQuery(String query
+            , [ FromQuery(Name = "ps") ] Int32 pageSize = 50
+            , [ FromQuery(Name = "p") ] Int32 page = 0)
         {
             try
             {
+                LoggerBundle.Trace("Registered GET request on ReleasesController.GetBySearchQuery");
                 if (!IsAuthorized(out IActionResult result))
                 {
+                    LoggerBundle.Trace("Request not authorized");
                     return result;
                 }
 
                 // validate
                 if (String.IsNullOrWhiteSpace(query))
                 {
+                    LoggerBundle.Trace("Validation failed: empty query");
                     return StatusCode((Int32) HttpStatusCode.BadRequest);
                 }
 
@@ -251,18 +310,23 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         }
 
         [ HttpGet("auth/releases/lookup/{query}") ]
-        public IActionResult GetByLookupQuery(String query, [ FromQuery(Name = "ps") ] Int32 pageSize = 50, [ FromQuery(Name = "p") ] Int32 page = 0)
+        public IActionResult GetByLookupQuery(String query
+            , [ FromQuery(Name = "ps") ] Int32 pageSize = 50
+            , [ FromQuery(Name = "p") ] Int32 page = 0)
         {
             try
             {
+                LoggerBundle.Trace("Registered GET request on ReleasesController.GetByLookupQuery");
                 if (!IsAuthorized(out IActionResult result))
                 {
+                    LoggerBundle.Trace("Request not authorized");
                     return result;
                 }
 
                 // verify
                 if (String.IsNullOrWhiteSpace(query))
                 {
+                    LoggerBundle.Trace("Validation failed: empty query");
                     return StatusCode((Int32) HttpStatusCode.BadRequest);
                 }
 
@@ -272,7 +336,13 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 // get data
                 using (DataContext dc = NewDataContext())
                 {
-                    return Ok(dc.SetReleases.AsNoTracking().Where(x => x.Title.Equals(query)).Include(x => x.TextRepresentation).Skip(page * pageSize).Take(pageSize).Select(x => x.ToJsonDictionary()).ToList());
+                    return Ok(dc.SetReleases.AsNoTracking()
+                        .Where(x => x.Title.Equals(query))
+                        .Include(x => x.TextRepresentation)
+                        .Skip(page * pageSize)
+                        .Take(pageSize)
+                        .Select(x => x.ToJsonDictionary())
+                        .ToList());
                 }
             }
             catch (Exception ex)

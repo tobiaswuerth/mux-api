@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using ch.wuerth.tobias.mux.API.Controllers.queries;
 using ch.wuerth.tobias.mux.API.extensions;
+using ch.wuerth.tobias.mux.Core.logging;
 using ch.wuerth.tobias.mux.Data;
 using ch.wuerth.tobias.mux.Data.models;
 using Microsoft.AspNetCore.Mvc;
@@ -18,8 +19,11 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         {
             try
             {
+                LoggerBundle.Trace("Registered GET request on ArtistsController.GetAll");
+
                 if (!IsAuthorized(out IActionResult result))
                 {
+                    LoggerBundle.Trace("Request not authorized");
                     return result;
                 }
 
@@ -54,25 +58,32 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         {
             try
             {
+                LoggerBundle.Trace("Registered GET request on ArtistsController.GetById");
+
                 if (!IsAuthorized(out IActionResult result))
                 {
+                    LoggerBundle.Trace("Request not authorized");
                     return result;
                 }
 
                 // validate
                 if (id == null)
                 {
+                    LoggerBundle.Trace("Validation failed: id is null");
                     return StatusCode((Int32) HttpStatusCode.BadRequest);
                 }
 
                 // get data
                 using (DataContext dc = NewDataContext())
                 {
-                    MusicBrainzArtist artist = dc.SetArtists.AsNoTracking().Include(x => x.MusicBrainzArtistMusicBrainzAliases).ThenInclude(x => x.MusicBrainzAlias).FirstOrDefault(x => x.UniqueId.Equals(id));
+                    MusicBrainzArtist artist = dc.SetArtists.AsNoTracking()
+                        .Include(x => x.MusicBrainzArtistMusicBrainzAliases)
+                        .ThenInclude(x => x.MusicBrainzAlias)
+                        .FirstOrDefault(x => x.UniqueId.Equals(id));
 
                     if (null == artist)
                     {
-                        // no matching record found
+                        LoggerBundle.Trace($"No artist found for given id '{id}'");
                         return StatusCode((Int32) HttpStatusCode.NotFound);
                     }
 
@@ -86,18 +97,24 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         }
 
         [ HttpGet("auth/artists/{id}/records") ]
-        public IActionResult GetRecordsById(Int32? id, [ FromQuery(Name = "ps") ] Int32 pageSize = 50, [ FromQuery(Name = "p") ] Int32 page = 0)
+        public IActionResult GetRecordsById(Int32? id
+            , [ FromQuery(Name = "ps") ] Int32 pageSize = 50
+            , [ FromQuery(Name = "p") ] Int32 page = 0)
         {
             try
             {
+                LoggerBundle.Trace("Registered GET request on ArtistsController.GetRecordsById");
+
                 if (!IsAuthorized(out IActionResult result))
                 {
+                    LoggerBundle.Trace("Request not authorized");
                     return result;
                 }
 
                 // validate
                 if (id == null)
                 {
+                    LoggerBundle.Trace("Validation failed: id is null");
                     return StatusCode((Int32) HttpStatusCode.BadRequest);
                 }
 
@@ -106,7 +123,12 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 // get data
                 using (DataContext dc = NewDataContext())
                 {
-                    return Ok(dc.SetMusicBrainzRecords.AsNoTracking().FromSql(ArtistQuery.GET_RECORDS_BY_ID, id).Skip(pageSize * page).Take(pageSize).Select(x => x.ToJsonDictionary()).ToList());
+                    return Ok(dc.SetMusicBrainzRecords.AsNoTracking()
+                        .FromSql(ArtistQuery.GET_RECORDS_BY_ID, id)
+                        .Skip(pageSize * page)
+                        .Take(pageSize)
+                        .Select(x => x.ToJsonDictionary())
+                        .ToList());
                 }
             }
             catch (Exception ex)
@@ -116,18 +138,24 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         }
 
         [ HttpGet("auth/artists/{id}/releases") ]
-        public IActionResult GetReleasesById(Int32? id, [ FromQuery(Name = "ps") ] Int32 pageSize = 50, [ FromQuery(Name = "p") ] Int32 page = 0)
+        public IActionResult GetReleasesById(Int32? id
+            , [ FromQuery(Name = "ps") ] Int32 pageSize = 50
+            , [ FromQuery(Name = "p") ] Int32 page = 0)
         {
             try
             {
+                LoggerBundle.Trace("Registered GET request on ArtistsController.GetReleasesById");
+
                 if (!IsAuthorized(out IActionResult result))
                 {
+                    LoggerBundle.Trace("Request not authorized");
                     return result;
                 }
 
                 // validate
                 if (id == null)
                 {
+                    LoggerBundle.Trace("Validation failed: id is null");
                     return StatusCode((Int32) HttpStatusCode.BadRequest);
                 }
 
@@ -136,7 +164,13 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 // get data
                 using (DataContext dc = NewDataContext())
                 {
-                    return Ok(dc.SetReleases.AsNoTracking().FromSql(ArtistQuery.GET_RELEASES_BY_ID, id).Include(x => x.TextRepresentation).Skip(pageSize * page).Take(pageSize).Select(x => x.ToJsonDictionary()).ToList());
+                    return Ok(dc.SetReleases.AsNoTracking()
+                        .FromSql(ArtistQuery.GET_RELEASES_BY_ID, id)
+                        .Include(x => x.TextRepresentation)
+                        .Skip(pageSize * page)
+                        .Take(pageSize)
+                        .Select(x => x.ToJsonDictionary())
+                        .ToList());
                 }
             }
             catch (Exception ex)
@@ -146,18 +180,24 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         }
 
         [ HttpGet("auth/artists/search/{query}") ]
-        public IActionResult GetBySearchQuery(String query, [ FromQuery(Name = "ps") ] Int32 pageSize = 50, [ FromQuery(Name = "p") ] Int32 page = 0)
+        public IActionResult GetBySearchQuery(String query
+            , [ FromQuery(Name = "ps") ] Int32 pageSize = 50
+            , [ FromQuery(Name = "p") ] Int32 page = 0)
         {
             try
             {
+                LoggerBundle.Trace("Registered GET request on ArtistsController.GetBySearchQuery");
+
                 if (!IsAuthorized(out IActionResult result))
                 {
+                    LoggerBundle.Trace("Request not authorized");
                     return result;
                 }
 
                 // validate
                 if (String.IsNullOrWhiteSpace(query))
                 {
+                    LoggerBundle.Trace("Validation failed: empty query");
                     return StatusCode((Int32) HttpStatusCode.BadRequest);
                 }
 
@@ -190,18 +230,24 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         }
 
         [ HttpGet("auth/artists/lookup/{query}") ]
-        public IActionResult GetByLookupQuery(String query, [ FromQuery(Name = "ps") ] Int32 pageSize = 50, [ FromQuery(Name = "p") ] Int32 page = 0)
+        public IActionResult GetByLookupQuery(String query
+            , [ FromQuery(Name = "ps") ] Int32 pageSize = 50
+            , [ FromQuery(Name = "p") ] Int32 page = 0)
         {
             try
             {
+                LoggerBundle.Trace("Registered GET request on ArtistsController.GetByLookupQuery");
+
                 if (!IsAuthorized(out IActionResult result))
                 {
+                    LoggerBundle.Trace("Request not authorized");
                     return result;
                 }
 
                 // validate
                 if (String.IsNullOrWhiteSpace(query))
                 {
+                    LoggerBundle.Trace("Validation failed: empty query");
                     return StatusCode((Int32) HttpStatusCode.BadRequest);
                 }
 
@@ -211,7 +257,14 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 // get data
                 using (DataContext dc = NewDataContext())
                 {
-                    return Ok(dc.SetArtists.AsNoTracking().Where(x => x.Name.Equals(query)).Skip(page * pageSize).Include(x => x.MusicBrainzArtistMusicBrainzAliases).ThenInclude(x => x.MusicBrainzAlias).Take(pageSize).Select(x => x.ToJsonDictionary()).ToList());
+                    return Ok(dc.SetArtists.AsNoTracking()
+                        .Where(x => x.Name.Equals(query))
+                        .Skip(page * pageSize)
+                        .Include(x => x.MusicBrainzArtistMusicBrainzAliases)
+                        .ThenInclude(x => x.MusicBrainzAlias)
+                        .Take(pageSize)
+                        .Select(x => x.ToJsonDictionary())
+                        .ToList());
                 }
             }
             catch (Exception ex)

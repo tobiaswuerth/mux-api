@@ -1,20 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ch.wuerth.tobias.mux.Core.logging;
 using ch.wuerth.tobias.mux.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ch.wuerth.tobias.mux.API.Controllers
 {
-    public class GlobalController : DataController
+    public class GlobalsController : DataController
     {
         [ HttpGet("auth/globals") ]
         public IActionResult Get()
         {
             try
             {
+                LoggerBundle.Trace("Registered GET request on GlobalsController.Get");
+
                 if (!IsAuthorized(out IActionResult result))
                 {
+                    LoggerBundle.Trace("Request not authorized");
                     return result;
                 }
 

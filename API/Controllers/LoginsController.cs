@@ -5,7 +5,8 @@ using System.Linq;
 using System.Net;
 using ch.wuerth.tobias.mux.API.security;
 using ch.wuerth.tobias.mux.API.security.jwt;
-using ch.wuerth.tobias.mux.Core.processor;
+using ch.wuerth.tobias.mux.Core.logging;
+using ch.wuerth.tobias.mux.Core.processing;
 using ch.wuerth.tobias.mux.Data;
 using ch.wuerth.tobias.mux.Data.models;
 using Microsoft.AspNetCore.Mvc;
@@ -13,8 +14,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ch.wuerth.tobias.mux.API.Controllers
 {
-    public class LoginController : DataController
+    public class LoginsController : DataController
     {
+        private static readonly UserJwtPayloadPipe UserJwtPayloadPipe = new UserJwtPayloadPipe();
+
         private IActionResult ProcessPayload(JwtPayload payload)
         {
             // generate token
@@ -22,6 +25,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
 
             if (String.IsNullOrWhiteSpace(token))
             {
+                LoggerBundle.Warn("JWT token generation failed: empty token");
                 return StatusCode((Int32) HttpStatusCode.InternalServerError);
             }
 
@@ -42,19 +46,17 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         {
             try
             {
+                LoggerBundle.Trace("Registered POST request on LoginsController.Login");
+
                 //validate data
                 if (String.IsNullOrWhiteSpace(values?.Password) || String.IsNullOrWhiteSpace(values.Username))
                 {
+                    LoggerBundle.Trace("Validation failed: empty username or password");
                     return StatusCode((Int32) HttpStatusCode.Unauthorized);
                 }
 
                 // hash password
-                (String output, Boolean success) pp = new PasswordProcessor().Handle(values.Password, Logger);
-
-                if (!pp.success)
-                {
-                    return StatusCode((Int32) HttpStatusCode.InternalServerError);
-                }
+                values.Password = new Sha512HashPipe().Process(values.Password);
 
                 // normalize username
                 values.Username = values.Username.Trim();
@@ -68,20 +70,19 @@ namespace ch.wuerth.tobias.mux.API.Controllers
 
                 if (null == user)
                 {
-                    // no user found with given username
+                    LoggerBundle.Trace($"No user found for given username '{values.Username}'");
                     return StatusCode((Int32) HttpStatusCode.Unauthorized);
                 }
 
-                if (!user.Password.Equals(pp.output))
+                if (!user.Password.Equals(values.Password))
                 {
-                    // password incorrect
+                    LoggerBundle.Trace($"Login attempt for user '{user.Username}' failed");
                     return StatusCode((Int32) HttpStatusCode.Unauthorized);
                 }
 
                 // prepare token generation
-                (JwtPayload output, Boolean success) jp = new JwtPayloadProcessor().Handle(user, Logger);
-
-                return !jp.success ? StatusCode((Int32) HttpStatusCode.InternalServerError) : ProcessPayload(jp.output);
+                JwtPayload payload = UserJwtPayloadPipe.Process(user);
+                return ProcessPayload(payload);
             }
             catch (Exception ex)
             {
@@ -94,7 +95,14 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         {
             try
             {
-                return !IsAuthorized(out IActionResult statusCode) ? statusCode : ProcessPayload(AuthorizedPayload);
+                LoggerBundle.Trace("Registered GET request on LoginController.RefreshToken");
+                if (IsAuthorized(out IActionResult statusCode))
+                {
+                    return ProcessPayload(AuthorizedPayload);
+                }
+
+                LoggerBundle.Trace("Request not authorized");
+                return statusCode;
             }
             catch (Exception ex)
             {

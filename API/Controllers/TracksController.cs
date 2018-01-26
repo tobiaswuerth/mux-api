@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using ch.wuerth.tobias.mux.API.extensions;
+using ch.wuerth.tobias.mux.Core.logging;
 using ch.wuerth.tobias.mux.Data;
 using ch.wuerth.tobias.mux.Data.models;
 using Microsoft.AspNetCore.Mvc;
@@ -17,8 +18,10 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         {
             try
             {
+                LoggerBundle.Trace("Registered GET request on TracksController.GetAll");
                 if (!IsAuthorized(out IActionResult result))
                 {
+                    LoggerBundle.Trace("Request not authorized");
                     return result;
                 }
 
@@ -27,7 +30,11 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 // get data
                 using (DataContext dc = NewDataContext())
                 {
-                    return Ok(dc.SetTracks.AsNoTracking().Skip(page * pageSize).Take(pageSize).Select(x => x.ToJsonDictionary()).ToList());
+                    return Ok(dc.SetTracks.AsNoTracking()
+                        .Skip(page * pageSize)
+                        .Take(pageSize)
+                        .Select(x => x.ToJsonDictionary())
+                        .ToList());
                 }
             }
             catch (Exception ex)
@@ -41,14 +48,17 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         {
             try
             {
+                LoggerBundle.Trace("Registered GET request on TracksController.GetById");
                 if (!IsAuthorized(out IActionResult result))
                 {
+                    LoggerBundle.Trace("Request not authorized");
                     return result;
                 }
 
                 // validate
                 if (id == null)
                 {
+                    LoggerBundle.Trace("Validation failed: id is null");
                     return StatusCode((Int32) HttpStatusCode.BadRequest);
                 }
 
@@ -57,13 +67,13 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 {
                     Track track = dc.SetTracks.AsNoTracking().FirstOrDefault(x => x.UniqueId.Equals(id));
 
-                    if (null == track)
+                    if (null != track)
                     {
-                        // no matching record found
-                        return StatusCode((Int32) HttpStatusCode.NotFound);
+                        return Ok(track.ToJsonDictionary());
                     }
 
-                    return Ok(track.ToJsonDictionary());
+                    LoggerBundle.Trace($"No track found for given id '{id}'");
+                    return StatusCode((Int32) HttpStatusCode.NotFound);
                 }
             }
             catch (Exception ex)
@@ -77,32 +87,41 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         {
             try
             {
+                LoggerBundle.Trace("Registered GET request on TracksController.GetRecordsById");
                 if (!IsAuthorized(out IActionResult result))
                 {
+                    LoggerBundle.Trace("Request not authorized");
                     return result;
                 }
 
                 // validate
                 if (id == null)
                 {
+                    LoggerBundle.Trace("Validation failed: id is null");
                     return StatusCode((Int32) HttpStatusCode.BadRequest);
                 }
 
                 // get data
                 using (DataContext dc = NewDataContext())
                 {
-                    Track track = dc.SetTracks.AsNoTracking().Include(x => x.AcoustIdResults).ThenInclude(x => x.AcoustId).ThenInclude(x => x.MusicBrainzRecordAcoustIds).ThenInclude(x => x.MusicBrainzRecord).FirstOrDefault(x => x.UniqueId.Equals(id));
+                    Track track = dc.SetTracks.AsNoTracking()
+                        .Include(x => x.AcoustIdResults)
+                        .ThenInclude(x => x.AcoustId)
+                        .ThenInclude(x => x.MusicBrainzRecordAcoustIds)
+                        .ThenInclude(x => x.MusicBrainzRecord)
+                        .FirstOrDefault(x => x.UniqueId.Equals(id));
 
                     if (null == track)
                     {
-                        // no matching record found
+                        LoggerBundle.Trace($"No track found for given id '{id}'");
                         return StatusCode((Int32) HttpStatusCode.NotFound);
                     }
 
                     // todo might need optimization with a direct database sql query
 
                     // loop references and keep track of relevant stats
-                    Dictionary<MusicBrainzRecord, (Int32 count, Double sum)> ret = new Dictionary<MusicBrainzRecord, (Int32, Double)>();
+                    Dictionary<MusicBrainzRecord, (Int32 count, Double sum)> ret =
+                        new Dictionary<MusicBrainzRecord, (Int32, Double)>();
 
                     track.AcoustIdResults.ForEach(x =>
                     {
