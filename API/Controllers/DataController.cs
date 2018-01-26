@@ -16,7 +16,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
     {
         private readonly JwtContextAuthenticatorPipe _contextAuthenticatorPipe;
 
-        private ApiConfig _config;
+        protected ApiConfig Config { get; }
 
         static DataController()
         {
@@ -37,8 +37,8 @@ namespace ch.wuerth.tobias.mux.API.Controllers
 
         protected DataController()
         {
-            _config = Configurator.Request<ApiConfig>(AuthConfigFilePath);
-            _contextAuthenticatorPipe = new JwtContextAuthenticatorPipe(_config.Authorization.Secret);
+            Config = Configurator.Request<ApiConfig>(AuthConfigFilePath);
+            _contextAuthenticatorPipe = new JwtContextAuthenticatorPipe(Config.Authorization.Secret);
         }
 
         private static String AuthConfigFilePath { get; } =
@@ -48,7 +48,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
 
         protected void NormalizePageSize(ref Int32 pageSize)
         {
-            pageSize = pageSize > _config.ResultMaxPageSize ? _config.ResultMaxPageSize : pageSize < 0 ? 0 : pageSize;
+            pageSize = pageSize > Config.ResultMaxPageSize ? Config.ResultMaxPageSize : pageSize < 0 ? 0 : pageSize;
         }
 
         protected Boolean IsAuthorized(out IActionResult statusCode)
