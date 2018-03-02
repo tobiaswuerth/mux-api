@@ -125,6 +125,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 {
                     return Ok(dc.SetMusicBrainzRecords.AsNoTracking()
                         .FromSql(ArtistQuery.GET_RECORDS_BY_ID, id)
+                        .OrderBy(x => x.Title)
                         .Skip(pageSize * page)
                         .Take(pageSize)
                         .Select(x => x.ToJsonDictionary())
@@ -167,6 +168,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                     return Ok(dc.SetReleases.AsNoTracking()
                         .FromSql(ArtistQuery.GET_RELEASES_BY_ID, id)
                         .Include(x => x.TextRepresentation)
+                        .OrderBy(x => x.Title)
                         .Skip(pageSize * page)
                         .Take(pageSize)
                         .Select(x => x.ToJsonDictionary())
@@ -259,9 +261,10 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 {
                     return Ok(dc.SetArtists.AsNoTracking()
                         .Where(x => x.Name.Equals(query))
-                        .Skip(page * pageSize)
                         .Include(x => x.MusicBrainzArtistMusicBrainzAliases)
                         .ThenInclude(x => x.MusicBrainzAlias)
+                        .OrderBy(x => x.UniqueId)
+                        .Skip(page * pageSize)
                         .Take(pageSize)
                         .Select(x => x.ToJsonDictionary())
                         .ToList());
