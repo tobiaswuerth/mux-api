@@ -156,5 +156,46 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 return HandleException(ex);
             }
         }
+
+        [ HttpGet("auth/tracks/search/{query}") ]
+        public IActionResult GetBySearchQuery(String query
+            , [ FromQuery(Name = "ps") ] Int32 pageSize = 50
+            , [ FromQuery(Name = "p") ] Int32 page = 0)
+        {
+            try
+            {
+                LoggerBundle.Trace("Registered GET request on TracksController.GetBySearchQuery");
+                if (!IsAuthorized(out IActionResult result))
+                {
+                    LoggerBundle.Trace("Request not authorized");
+                    return result;
+                }
+
+                // validate
+                if (String.IsNullOrWhiteSpace(query))
+                {
+                    LoggerBundle.Trace("Validation failed: empty query");
+                    return StatusCode((Int32) HttpStatusCode.BadRequest);
+                }
+
+                NormalizePageSize(ref pageSize);
+                query = query.Trim();
+
+                // get data
+                using (DataContext dc = NewDataContext())
+                {
+                    return Ok(dc.SetTracks.AsNoTracking()
+                        .Where(x => x.Path.Contains(query))
+                        .Skip(page * pageSize)
+                        .Take(pageSize)
+                        .Select(x => x.ToJsonDictionary())
+                        .ToList());
+                }
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
+        }
     }
 }
