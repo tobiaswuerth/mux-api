@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using ch.wuerth.tobias.mux.API.Controllers.queries;
 using ch.wuerth.tobias.mux.API.extensions;
 using ch.wuerth.tobias.mux.Core.logging;
 using ch.wuerth.tobias.mux.Data;
@@ -180,13 +181,14 @@ namespace ch.wuerth.tobias.mux.API.Controllers
 
                 NormalizePageSize(ref pageSize);
                 query = query.Trim();
+                query = $"%{query}%";
 
                 // get data
                 using (DataContext dc = NewDataContext())
                 {
                     return Ok(dc.SetTracks.AsNoTracking()
-                        .Where(x => x.Path.Contains(query))
-                        .Skip(page * pageSize)
+                        .FromSql(TrackQuery.GET_TRACKS_LIKE_PATH, query)
+                        .Skip(pageSize * page)
                         .Take(pageSize)
                         .Select(x => x.ToJsonDictionary())
                         .ToList());
