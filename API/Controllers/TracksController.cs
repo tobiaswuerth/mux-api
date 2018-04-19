@@ -29,7 +29,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 NormalizePageSize(ref pageSize);
 
                 // get data
-                using (DataContext dc = NewDataContext())
+                using (DataContext dc = DataContextFactory.GetInstance())
                 {
                     return Ok(dc.SetTracks.AsNoTracking()
                         .Skip(page * pageSize)
@@ -64,7 +64,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 }
 
                 // get data
-                using (DataContext dc = NewDataContext())
+                using (DataContext dc = DataContextFactory.GetInstance())
                 {
                     Track track = dc.SetTracks.AsNoTracking().FirstOrDefault(x => x.UniqueId.Equals(id));
 
@@ -103,7 +103,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 }
 
                 // get data
-                using (DataContext dc = NewDataContext())
+                using (DataContext dc = DataContextFactory.GetInstance())
                 {
                     Track track = dc.SetTracks.AsNoTracking()
                         .Include(x => x.AcoustIdResults)
@@ -184,7 +184,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 query = $"%{query}%";
 
                 // get data
-                using (DataContext dc = NewDataContext())
+                using (DataContext dc = DataContextFactory.GetInstance())
                 {
                     return Ok(dc.SetTracks.AsNoTracking()
                         .FromSql(TrackQuery.GET_TRACKS_LIKE_PATH, query)

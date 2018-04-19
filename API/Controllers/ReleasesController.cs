@@ -29,7 +29,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 NormalizePageSize(ref pageSize);
 
                 // get data
-                using (DataContext dc = NewDataContext())
+                using (DataContext dc = DataContextFactory.GetInstance())
                 {
                     return Ok(dc.SetReleases.AsNoTracking()
                         .Where(x => null != x.Title)
@@ -73,7 +73,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 }
 
                 // get data
-                using (DataContext dc = NewDataContext())
+                using (DataContext dc = DataContextFactory.GetInstance())
                 {
                     MusicBrainzRelease release = dc.SetReleases.AsNoTracking()
                         .Include(x => x.TextRepresentation)
@@ -118,7 +118,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 NormalizePageSize(ref pageSize);
 
                 // get data
-                using (DataContext dc = NewDataContext())
+                using (DataContext dc = DataContextFactory.GetInstance())
                 {
                     return Ok(dc.SetMusicBrainzRecords.AsNoTracking()
                         .FromSql(ReleaseQuery.GET_RECORDS_BY_ID, id)
@@ -159,7 +159,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 NormalizePageSize(ref pageSize);
 
                 // get data
-                using (DataContext dc = NewDataContext())
+                using (DataContext dc = DataContextFactory.GetInstance())
                 {
                     return Ok(dc.SetArtistCredits.AsNoTracking()
                         .FromSql(ReleaseQuery.GET_ARTISTS_BY_ID, id)
@@ -203,7 +203,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 NormalizePageSize(ref pageSize);
 
                 // get data
-                using (DataContext dc = NewDataContext())
+                using (DataContext dc = DataContextFactory.GetInstance())
                 {
                     return Ok(dc.SetAliases.AsNoTracking()
                         .FromSql(ReleaseQuery.GET_ALIASES_BY_ID, id)
@@ -244,7 +244,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 NormalizePageSize(ref pageSize);
 
                 // get data
-                using (DataContext dc = NewDataContext())
+                using (DataContext dc = DataContextFactory.GetInstance())
                 {
                     return Ok(dc.SetReleaseEvents.AsNoTracking()
                         .FromSql(ReleaseQuery.GET_RELEASE_EVENTS_BY_ID, id)
@@ -289,7 +289,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 query = query.Trim();
 
                 // get data
-                using (DataContext dc = NewDataContext())
+                using (DataContext dc = DataContextFactory.GetInstance())
                 {
                     return Ok(dc.SetReleases.AsNoTracking()
                         .Where(x => x.Title.Contains(query))
@@ -338,7 +338,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 query = query.Trim();
 
                 // get data
-                using (DataContext dc = NewDataContext())
+                using (DataContext dc = DataContextFactory.GetInstance())
                 {
                     return Ok(dc.SetReleases.AsNoTracking()
                         .Where(x => x.Title.Equals(query))

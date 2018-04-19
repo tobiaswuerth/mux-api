@@ -22,7 +22,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                     return result;
                 }
 
-                using (DataContext dataContext = NewDataContext())
+                using (DataContext dataContext = DataContextFactory.GetInstance())
                 {
                     return Ok(new Dictionary<String, Object>
                     {

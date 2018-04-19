@@ -63,7 +63,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
 
                 // check database for given username
                 User user;
-                using (DataContext dc = NewDataContext())
+                using (DataContext dc = DataContextFactory.GetInstance())
                 {
                     user = dc.SetUsers.AsNoTracking().FirstOrDefault(x => x.Username.Equals(values.Username));
                 }

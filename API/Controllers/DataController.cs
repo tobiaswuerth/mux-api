@@ -58,7 +58,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
             {
                 JwtPayload payload = _contextAuthenticatorPipe.Process(HttpContext);
 
-                using (DataContext context = NewDataContext())
+                using (DataContext context = DataContextFactory.GetInstance())
                 {
                     Boolean found = context.SetUsers.Any(x
                         => x.UniqueId.Equals(payload.ClientId) && x.Username.ToLower().Equals(payload.Name));
@@ -86,11 +86,6 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         {
             LoggerBundle.Error(ex);
             return StatusCode((Int32) HttpStatusCode.InternalServerError);
-        }
-
-        protected DataContext NewDataContext()
-        {
-            return new DataContext(new DbContextOptions<DataContext>());
         }
     }
 }
