@@ -8,7 +8,6 @@ using ch.wuerth.tobias.mux.Core.logging;
 using ch.wuerth.tobias.mux.Data;
 using global::ch.wuerth.tobias.mux.Core.global;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace ch.wuerth.tobias.mux.API.Controllers
 {
