@@ -1,12 +1,8 @@
 ﻿using System;
 
-namespace ch.wuerth.tobias.mux.API.security
+namespace ch.wuerth.tobias.mux.API.Controllers.models
 {
-    #region usings
-
-    #endregion
-
-    public class AuthenticationModel
+    public class InviteModel
     {
         public String Username { get; set; }
         public String Password { get; set; }

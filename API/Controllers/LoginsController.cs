@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net;
-using ch.wuerth.tobias.mux.API.security;
+using ch.wuerth.tobias.mux.API.Controllers.models;
 using ch.wuerth.tobias.mux.API.security.jwt;
 using ch.wuerth.tobias.mux.Core.logging;
 using ch.wuerth.tobias.mux.Core.processing;
