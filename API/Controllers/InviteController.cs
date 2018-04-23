@@ -143,11 +143,6 @@ namespace ch.wuerth.tobias.mux.API.Controllers
             try
             {
                 LoggerBundle.Trace("Registered POST request on InviteController.Use");
-                if (!IsAuthorized(out IActionResult result, u => u.CanInvite))
-                {
-                    LoggerBundle.Trace("Request not authorized");
-                    return result;
-                }
 
                 // validate
                 if (null == token)
@@ -208,7 +203,6 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                     Invite invite = dc.SetInvites.Include(x => x.CreateUser)
                         .Include(x => x.RegisteredUser)
                         .Where(x => x.CreateUser.CanInvite)
-                        .Where(x => x.CreateUser.UniqueId.Equals(AuthorizedUser.UniqueId))
                         .FirstOrDefault(x => x.Token.Equals(token));
 
                     if (null == invite)
