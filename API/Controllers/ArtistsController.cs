@@ -30,7 +30,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 NormalizePageSize(ref pageSize);
 
                 // get data
-                using (DataContext dc = NewDataContext())
+                using (DataContext dc = DataContextFactory.GetInstance())
                 {
                     return Ok(dc.SetArtists.AsNoTracking()
                         .Select(x => x.Name)
@@ -74,7 +74,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 }
 
                 // get data
-                using (DataContext dc = NewDataContext())
+                using (DataContext dc = DataContextFactory.GetInstance())
                 {
                     MusicBrainzArtist artist = dc.SetArtists.AsNoTracking()
                         .Include(x => x.MusicBrainzArtistMusicBrainzAliases)
@@ -121,7 +121,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 NormalizePageSize(ref pageSize);
 
                 // get data
-                using (DataContext dc = NewDataContext())
+                using (DataContext dc = DataContextFactory.GetInstance())
                 {
                     return Ok(dc.SetMusicBrainzRecords.AsNoTracking()
                         .FromSql(ArtistQuery.GET_RECORDS_BY_ID, id)
@@ -163,7 +163,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 NormalizePageSize(ref pageSize);
 
                 // get data
-                using (DataContext dc = NewDataContext())
+                using (DataContext dc = DataContextFactory.GetInstance())
                 {
                     return Ok(dc.SetReleases.AsNoTracking()
                         .FromSql(ArtistQuery.GET_RELEASES_BY_ID, id)
@@ -207,7 +207,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 query = query.Trim();
 
                 // get data
-                using (DataContext dc = NewDataContext())
+                using (DataContext dc = DataContextFactory.GetInstance())
                 {
                     return Ok(dc.SetArtists.AsNoTracking()
                         .Where(x => x.Name.Contains(query))
@@ -257,7 +257,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 query = query.Trim();
 
                 // get data
-                using (DataContext dc = NewDataContext())
+                using (DataContext dc = DataContextFactory.GetInstance())
                 {
                     return Ok(dc.SetArtists.AsNoTracking()
                         .Where(x => x.Name.Equals(query))

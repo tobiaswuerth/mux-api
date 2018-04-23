@@ -6,6 +6,7 @@ using System.Net;
 using ch.wuerth.tobias.mux.API.security.jwt;
 using ch.wuerth.tobias.mux.Core.logging;
 using ch.wuerth.tobias.mux.Data;
+using ch.wuerth.tobias.mux.Data.models;
 using global::ch.wuerth.tobias.mux.Core.global;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -46,28 +47,43 @@ namespace ch.wuerth.tobias.mux.API.Controllers
             Path.Combine(Location.ApplicationDataDirectoryPath, "mux_config_auth");
 
         protected JwtPayload AuthorizedPayload { get; private set; }
+        protected User AuthorizedUser { get; private set; }
 
         protected void NormalizePageSize(ref Int32 pageSize)
         {
             pageSize = pageSize > Config.ResultMaxPageSize ? Config.ResultMaxPageSize : pageSize < 0 ? 0 : pageSize;
         }
 
-        protected Boolean IsAuthorized(out IActionResult statusCode)
+        protected Boolean IsAuthorized(out IActionResult statusCode, Func<User, Boolean> customUserAuthorization = null)
         {
             try
             {
                 JwtPayload payload = _contextAuthenticatorPipe.Process(HttpContext);
 
-                using (DataContext context = NewDataContext())
+                using (DataContext context = DataContextFactory.GetInstance())
                 {
-                    Boolean found = context.SetUsers.Any(x
-                        => x.UniqueId.Equals(payload.ClientId) && x.Username.ToLower().Equals(payload.Name));
-                    if (!found)
+                    User user = context.SetUsers.Include(x => x.Invites)
+                        .FirstOrDefault(x => x.UniqueId.Equals(payload.ClientId) && x.Username.ToLower().Equals(payload.Name));
+
+                    if (null == user)
                     {
                         LoggerBundle.Warn($"Got valid payload for user which is not in database: '{payload.Name}'");
                         statusCode = StatusCode((Int32) HttpStatusCode.Unauthorized);
                         return false;
                     }
+
+                    if (null != customUserAuthorization)
+                    {
+                        Boolean customAuthorization = customUserAuthorization.Invoke(user);
+                        if (!customAuthorization)
+                        {
+                            LoggerBundle.Warn($"Got valid payload for user '{payload.Name}' but custom authorization failed");
+                            statusCode = StatusCode((Int32) HttpStatusCode.Unauthorized);
+                            return false;
+                        }
+                    }
+
+                    AuthorizedUser = user;
                 }
 
                 statusCode = null;
@@ -86,11 +102,6 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         {
             LoggerBundle.Error(ex);
             return StatusCode((Int32) HttpStatusCode.InternalServerError);
-        }
-
-        protected DataContext NewDataContext()
-        {
-            return new DataContext(new DbContextOptions<DataContext>());
         }
     }
 }

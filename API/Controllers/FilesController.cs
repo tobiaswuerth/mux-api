@@ -34,7 +34,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
 
                 // get track
                 Track track;
-                using (DataContext dataContext = NewDataContext())
+                using (DataContext dataContext = DataContextFactory.GetInstance())
                 {
                     track = dataContext.SetTracks.FirstOrDefault(x => x.UniqueId.Equals(id));
                 }

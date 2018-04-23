@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net;
-using ch.wuerth.tobias.mux.API.security;
+using ch.wuerth.tobias.mux.API.Controllers.models;
 using ch.wuerth.tobias.mux.API.security.jwt;
 using ch.wuerth.tobias.mux.Core.logging;
 using ch.wuerth.tobias.mux.Core.processing;
@@ -63,7 +63,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
 
                 // check database for given username
                 User user;
-                using (DataContext dc = NewDataContext())
+                using (DataContext dc = DataContextFactory.GetInstance())
                 {
                     user = dc.SetUsers.AsNoTracking().FirstOrDefault(x => x.Username.Equals(values.Username));
                 }
