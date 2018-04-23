@@ -55,9 +55,9 @@ all events of a release
 ### Artists
 * GET*	`auth/artists`
 all artists
-* GET*	`auth/artists/search/{query}`
-all artists where name matches exactly query
 * GET*	`auth/artists/lookup/{query}`
+all artists where name matches exactly query
+* GET*	`auth/artists/search/{query}`
 all artists where name matches like query 
 * GET		`auth/artists/{id}`
 one specific artist
@@ -69,10 +69,34 @@ all releases of an artist
 ### Tracks
 * GET*	`auth/tracks`
 all tracks
+* GET* `auth/tracks/search/{query}`
+all tracks where path matches like query
 * GET		`auth/tracks/{id}`
 one specific track
 * GET*	`auth/tracks/{id}/records`
 all records of a track
+
+### Invites
+* GET* `auth/invites`
+all invites of authorized user
+* PUT `auth/invites`
+create a new invite
+* DELETE `auth/invites/{id}`
+delete a specific invite
+* POST `auth/invites/{token}`
+use an invite to register a new user
+
+## Example Bodies
+All bodies are expected to be in valid JSON format.
+
+* POST @ auth/invites/{token}
+```json
+{
+    "username": "your_username",
+    "password": "base64Password"
+}
+```
+
 
 -----
 
