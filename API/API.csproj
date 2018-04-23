@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
+    <PublishWithAspNetCoreTargetManifest>false</PublishWithAspNetCoreTargetManifest>
     <AssemblyName>ch.wuerth.tobias.mux.API</AssemblyName>
     <RootNamespace>ch.wuerth.tobias.mux.API</RootNamespace>
     <Copyright>Tobias Würth</Copyright>
