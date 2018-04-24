@@ -17,6 +17,7 @@ namespace ch.wuerth.tobias.mux.API.security.jwt
             {
                 Name = o.Username
                 , ClientId = o.UniqueId
+                , CanInvite = o.CanInvite
             };
         }) { }
     }
