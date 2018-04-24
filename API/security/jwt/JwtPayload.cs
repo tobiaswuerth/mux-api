@@ -8,5 +8,6 @@ namespace ch.wuerth.tobias.mux.API.security.jwt
         public String Name { get; set; }
         public DateTime Exp { get; set; } // expires at
         public DateTime Iat { get; set; } // issued at
+        public Boolean CanInvite { get; set; }
     }
 }
