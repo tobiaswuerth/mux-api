@@ -89,15 +89,20 @@ use an invite to register a new user
 ## Example Bodies
 All bodies are expected to be in valid JSON format.
 
-* POST @ auth/invites/{token}
+* POST @ `auth/invites/{token}`
 ```json
 {
     "username": "your_username",
-    "password": "base64Password"
+    "password": "your_base64_password"
 }
 ```
 
-
+* POST @ `public/login`
+```json
+{
+    "username": "your_username",
+    "password": "your_base64_password"
+}
 -----
 
 **Note:**
