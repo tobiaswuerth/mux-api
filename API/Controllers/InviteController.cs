@@ -137,7 +137,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
             }
         }
 
-        [ HttpPost("auth/invites/{token}") ]
+        [ HttpPost("public/invites/{token}") ]
         public IActionResult Use(String token, [ FromBody ] InviteModel model)
         {
             try
