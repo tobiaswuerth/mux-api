@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net;
+using System.Text;
 using ch.wuerth.tobias.mux.API.Controllers.models;
 using ch.wuerth.tobias.mux.API.security.jwt;
 using ch.wuerth.tobias.mux.Core.logging;
@@ -49,14 +50,17 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 LoggerBundle.Trace("Registered POST request on LoginsController.Login");
 
                 //validate data
-                if (String.IsNullOrWhiteSpace(values?.Password) || String.IsNullOrWhiteSpace(values.Username))
+                String passwordBase64 = values?.Password;
+                if (String.IsNullOrWhiteSpace(passwordBase64) || String.IsNullOrWhiteSpace(values.Username))
                 {
                     LoggerBundle.Trace("Validation failed: empty username or password");
                     return StatusCode((Int32) HttpStatusCode.Unauthorized);
                 }
 
                 // hash password
-                values.Password = new Sha512HashPipe().Process(values.Password);
+                Byte[] bPassword = Convert.FromBase64String(passwordBase64);
+                String password = Encoding.UTF8.GetString(bPassword);
+                String passwordHash = new Sha512HashPipe().Process(password);
 
                 // normalize username
                 values.Username = values.Username.Trim();
@@ -74,7 +78,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                     return StatusCode((Int32) HttpStatusCode.Unauthorized);
                 }
 
-                if (!user.Password.Equals(values.Password))
+                if (!user.Password.Equals(passwordHash))
                 {
                     LoggerBundle.Trace($"Login attempt for user '{user.Username}' failed");
                     return StatusCode((Int32) HttpStatusCode.Unauthorized);
