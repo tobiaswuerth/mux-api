@@ -49,9 +49,10 @@ namespace ch.wuerth.tobias.mux.API.Controllers
         protected JwtPayload AuthorizedPayload { get; private set; }
         protected User AuthorizedUser { get; private set; }
 
-        protected void NormalizePageSize(ref Int32 pageSize)
+        protected IActionResult HandleException(Exception ex)
         {
-            pageSize = pageSize > Config.ResultMaxPageSize ? Config.ResultMaxPageSize : pageSize < 0 ? 0 : pageSize;
+            LoggerBundle.Error(ex);
+            return StatusCode((Int32) HttpStatusCode.InternalServerError);
         }
 
         protected Boolean IsAuthorized(out IActionResult statusCode, Func<User, Boolean> customUserAuthorization = null)
@@ -63,6 +64,25 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 using (DataContext context = DataContextFactory.GetInstance())
                 {
                     User user = context.SetUsers.Include(x => x.Invites)
+                        .ThenInclude(x => x.CreateUser)
+                        .Include(x => x.Invite)
+                        .ThenInclude(x => x.RegisteredUser)
+                        .Include(x => x.Playlists)
+                        .ThenInclude(x => x.PlaylistEntries)
+                        .Include(x => x.Playlists)
+                        .ThenInclude(x => x.CreateUser)
+                        .Include(x => x.Playlists)
+                        .ThenInclude(x => x.PlaylistPermissions)
+                        .Include(x => x.PlaylistEntries)
+                        .ThenInclude(x => x.CreateUser)
+                        .Include(x => x.PlaylistEntries)
+                        .ThenInclude(x => x.Playlist)
+                        .Include(x => x.PlaylistEntries)
+                        .ThenInclude(x => x.Track)
+                        .Include(x => x.PlaylistPermissions)
+                        .ThenInclude(x => x.Playlist)
+                        .Include(x => x.PlaylistPermissions)
+                        .ThenInclude(x => x.User)
                         .FirstOrDefault(x => x.UniqueId.Equals(payload.ClientId) && x.Username.ToLower().Equals(payload.Name));
 
                     if (null == user)
@@ -98,10 +118,9 @@ namespace ch.wuerth.tobias.mux.API.Controllers
             }
         }
 
-        protected IActionResult HandleException(Exception ex)
+        protected void NormalizePageSize(ref Int32 pageSize)
         {
-            LoggerBundle.Error(ex);
-            return StatusCode((Int32) HttpStatusCode.InternalServerError);
+            pageSize = pageSize > Config.ResultMaxPageSize ? Config.ResultMaxPageSize : pageSize < 0 ? 0 : pageSize;
         }
     }
 }

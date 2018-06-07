@@ -83,6 +83,48 @@ namespace ch.wuerth.tobias.mux.API.Controllers
             }
         }
 
+        [ HttpGet("auth/tracks/search/{query}") ]
+        public IActionResult GetBySearchQuery(String query
+            , [ FromQuery(Name = "ps") ] Int32 pageSize = 50
+            , [ FromQuery(Name = "p") ] Int32 page = 0)
+        {
+            try
+            {
+                LoggerBundle.Trace("Registered GET request on TracksController.GetBySearchQuery");
+                if (!IsAuthorized(out IActionResult result))
+                {
+                    LoggerBundle.Trace("Request not authorized");
+                    return result;
+                }
+
+                // validate
+                if (String.IsNullOrWhiteSpace(query))
+                {
+                    LoggerBundle.Trace("Validation failed: empty query");
+                    return StatusCode((Int32) HttpStatusCode.BadRequest);
+                }
+
+                NormalizePageSize(ref pageSize);
+                query = query.Trim();
+                query = $"%{query}%";
+
+                // get data
+                using (DataContext dc = DataContextFactory.GetInstance())
+                {
+                    return Ok(dc.SetTracks.AsNoTracking()
+                        .FromSql(TrackQuery.GET_TRACKS_LIKE_PATH, query)
+                        .Skip(pageSize * page)
+                        .Take(pageSize)
+                        .Select(x => x.ToJsonDictionary())
+                        .ToList());
+                }
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
+        }
+
         [ HttpGet("auth/tracks/{id}/records") ]
         public IActionResult GetRecordsById(Int32? id)
         {
@@ -150,48 +192,6 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                             "Record", x.Key.ToJsonDictionary()
                         }
                     }));
-                }
-            }
-            catch (Exception ex)
-            {
-                return HandleException(ex);
-            }
-        }
-
-        [ HttpGet("auth/tracks/search/{query}") ]
-        public IActionResult GetBySearchQuery(String query
-            , [ FromQuery(Name = "ps") ] Int32 pageSize = 50
-            , [ FromQuery(Name = "p") ] Int32 page = 0)
-        {
-            try
-            {
-                LoggerBundle.Trace("Registered GET request on TracksController.GetBySearchQuery");
-                if (!IsAuthorized(out IActionResult result))
-                {
-                    LoggerBundle.Trace("Request not authorized");
-                    return result;
-                }
-
-                // validate
-                if (String.IsNullOrWhiteSpace(query))
-                {
-                    LoggerBundle.Trace("Validation failed: empty query");
-                    return StatusCode((Int32) HttpStatusCode.BadRequest);
-                }
-
-                NormalizePageSize(ref pageSize);
-                query = query.Trim();
-                query = $"%{query}%";
-
-                // get data
-                using (DataContext dc = DataContextFactory.GetInstance())
-                {
-                    return Ok(dc.SetTracks.AsNoTracking()
-                        .FromSql(TrackQuery.GET_TRACKS_LIKE_PATH, query)
-                        .Skip(pageSize * page)
-                        .Take(pageSize)
-                        .Select(x => x.ToJsonDictionary())
-                        .ToList());
                 }
             }
             catch (Exception ex)
