@@ -16,6 +16,56 @@ namespace ch.wuerth.tobias.mux.API.Controllers
 {
     public class InviteController : DataController
     {
+        [ HttpDelete("auth/invites/{id}") ]
+        public IActionResult Delete(Int32? id)
+        {
+            try
+            {
+                LoggerBundle.Trace("Registered DELETE request on InviteController.Delete");
+                if (!IsAuthorized(out IActionResult result, u => u.CanInvite))
+                {
+                    LoggerBundle.Trace("Request not authorized");
+                    return result;
+                }
+
+                // validate
+                if (null == id)
+                {
+                    LoggerBundle.Trace("Validation failed: id is null");
+                    return StatusCode((Int32) HttpStatusCode.BadRequest);
+                }
+
+                using (DataContext dc = DataContextFactory.GetInstance())
+                {
+                    Invite invite = dc.SetInvites.Include(x => x.CreateUser)
+                        .Include(x => x.RegisteredUser)
+                        .Where(x => x.CreateUser.CanInvite)
+                        .Where(x => x.CreateUser.UniqueId.Equals(AuthorizedUser.UniqueId))
+                        .FirstOrDefault(x => x.UniqueId.Equals(id));
+
+                    if (null == invite)
+                    {
+                        LoggerBundle.Trace($"No invite found for given id '{id}'");
+                        return StatusCode((Int32) HttpStatusCode.NotFound);
+                    }
+
+                    if (null != invite.RegisteredUser)
+                    {
+                        LoggerBundle.Trace($"Invite with id '{id}' has already been used and can therefor not be deleted");
+                        return StatusCode((Int32) HttpStatusCode.Conflict);
+                    }
+
+                    dc.SetInvites.Remove(invite);
+                    dc.SaveChanges();
+                    return Ok();
+                }
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
+        }
+
         [ HttpGet("auth/invites") ]
         public IActionResult GetAll([ FromQuery(Name = "ps") ] Int32 pageSize = 50, [ FromQuery(Name = "p") ] Int32 page = 0)
         {
@@ -80,56 +130,6 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 }
 
                 return Ok(invite.ToJsonDictionary());
-            }
-            catch (Exception ex)
-            {
-                return HandleException(ex);
-            }
-        }
-
-        [ HttpDelete("auth/invites/{id}") ]
-        public IActionResult Delete(Int32? id)
-        {
-            try
-            {
-                LoggerBundle.Trace("Registered DELETE request on InviteController.Delete");
-                if (!IsAuthorized(out IActionResult result, u => u.CanInvite))
-                {
-                    LoggerBundle.Trace("Request not authorized");
-                    return result;
-                }
-
-                // validate
-                if (null == id)
-                {
-                    LoggerBundle.Trace("Validation failed: id is null");
-                    return StatusCode((Int32) HttpStatusCode.BadRequest);
-                }
-
-                using (DataContext dc = DataContextFactory.GetInstance())
-                {
-                    Invite invite = dc.SetInvites.Include(x => x.CreateUser)
-                        .Include(x => x.RegisteredUser)
-                        .Where(x => x.CreateUser.CanInvite)
-                        .Where(x => x.CreateUser.UniqueId.Equals(AuthorizedUser.UniqueId))
-                        .FirstOrDefault(x => x.UniqueId.Equals(id));
-
-                    if (null == invite)
-                    {
-                        LoggerBundle.Trace($"No invite found for given id '{id}'");
-                        return StatusCode((Int32) HttpStatusCode.NotFound);
-                    }
-
-                    if (null != invite.RegisteredUser)
-                    {
-                        LoggerBundle.Trace($"Invite with id '{id}' has already been used and can therefor not be deleted");
-                        return StatusCode((Int32) HttpStatusCode.Conflict);
-                    }
-
-                    dc.SetInvites.Remove(invite);
-                    dc.SaveChanges();
-                    return Ok();
-                }
             }
             catch (Exception ex)
             {

@@ -96,6 +96,101 @@ namespace ch.wuerth.tobias.mux.API.Controllers
             }
         }
 
+        [ HttpGet("auth/artists/lookup/{query}") ]
+        public IActionResult GetByLookupQuery(String query
+            , [ FromQuery(Name = "ps") ] Int32 pageSize = 50
+            , [ FromQuery(Name = "p") ] Int32 page = 0)
+        {
+            try
+            {
+                LoggerBundle.Trace("Registered GET request on ArtistsController.GetByLookupQuery");
+
+                if (!IsAuthorized(out IActionResult result))
+                {
+                    LoggerBundle.Trace("Request not authorized");
+                    return result;
+                }
+
+                // validate
+                if (String.IsNullOrWhiteSpace(query))
+                {
+                    LoggerBundle.Trace("Validation failed: empty query");
+                    return StatusCode((Int32) HttpStatusCode.BadRequest);
+                }
+
+                NormalizePageSize(ref pageSize);
+                query = query.Trim();
+
+                // get data
+                using (DataContext dc = DataContextFactory.GetInstance())
+                {
+                    return Ok(dc.SetArtists.AsNoTracking()
+                        .Where(x => x.Name.Equals(query))
+                        .Include(x => x.MusicBrainzArtistMusicBrainzAliases)
+                        .ThenInclude(x => x.MusicBrainzAlias)
+                        .OrderBy(x => x.UniqueId)
+                        .Skip(page * pageSize)
+                        .Take(pageSize)
+                        .Select(x => x.ToJsonDictionary())
+                        .ToList());
+                }
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
+        }
+
+        [ HttpGet("auth/artists/search/{query}") ]
+        public IActionResult GetBySearchQuery(String query
+            , [ FromQuery(Name = "ps") ] Int32 pageSize = 50
+            , [ FromQuery(Name = "p") ] Int32 page = 0)
+        {
+            try
+            {
+                LoggerBundle.Trace("Registered GET request on ArtistsController.GetBySearchQuery");
+
+                if (!IsAuthorized(out IActionResult result))
+                {
+                    LoggerBundle.Trace("Request not authorized");
+                    return result;
+                }
+
+                // validate
+                if (String.IsNullOrWhiteSpace(query))
+                {
+                    LoggerBundle.Trace("Validation failed: empty query");
+                    return StatusCode((Int32) HttpStatusCode.BadRequest);
+                }
+
+                NormalizePageSize(ref pageSize);
+                query = query.Trim();
+
+                // get data
+                using (DataContext dc = DataContextFactory.GetInstance())
+                {
+                    return Ok(dc.SetArtists.AsNoTracking()
+                        .Where(x => x.Name.Contains(query))
+                        .Select(x => x.Name)
+                        .OrderBy(x => x)
+                        .Distinct()
+                        .Skip(page * pageSize)
+                        .Take(pageSize)
+                        .Select(x => new Dictionary<String, Object>
+                        {
+                            {
+                                "Name", x
+                            }
+                        })
+                        .ToList());
+                }
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
+        }
+
         [ HttpGet("auth/artists/{id}/records") ]
         public IActionResult GetRecordsById(Int32? id
             , [ FromQuery(Name = "ps") ] Int32 pageSize = 50
@@ -170,101 +265,6 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                         .Include(x => x.TextRepresentation)
                         .OrderBy(x => x.Title)
                         .Skip(pageSize * page)
-                        .Take(pageSize)
-                        .Select(x => x.ToJsonDictionary())
-                        .ToList());
-                }
-            }
-            catch (Exception ex)
-            {
-                return HandleException(ex);
-            }
-        }
-
-        [ HttpGet("auth/artists/search/{query}") ]
-        public IActionResult GetBySearchQuery(String query
-            , [ FromQuery(Name = "ps") ] Int32 pageSize = 50
-            , [ FromQuery(Name = "p") ] Int32 page = 0)
-        {
-            try
-            {
-                LoggerBundle.Trace("Registered GET request on ArtistsController.GetBySearchQuery");
-
-                if (!IsAuthorized(out IActionResult result))
-                {
-                    LoggerBundle.Trace("Request not authorized");
-                    return result;
-                }
-
-                // validate
-                if (String.IsNullOrWhiteSpace(query))
-                {
-                    LoggerBundle.Trace("Validation failed: empty query");
-                    return StatusCode((Int32) HttpStatusCode.BadRequest);
-                }
-
-                NormalizePageSize(ref pageSize);
-                query = query.Trim();
-
-                // get data
-                using (DataContext dc = DataContextFactory.GetInstance())
-                {
-                    return Ok(dc.SetArtists.AsNoTracking()
-                        .Where(x => x.Name.Contains(query))
-                        .Select(x => x.Name)
-                        .OrderBy(x => x)
-                        .Distinct()
-                        .Skip(page * pageSize)
-                        .Take(pageSize)
-                        .Select(x => new Dictionary<String, Object>
-                        {
-                            {
-                                "Name", x
-                            }
-                        })
-                        .ToList());
-                }
-            }
-            catch (Exception ex)
-            {
-                return HandleException(ex);
-            }
-        }
-
-        [ HttpGet("auth/artists/lookup/{query}") ]
-        public IActionResult GetByLookupQuery(String query
-            , [ FromQuery(Name = "ps") ] Int32 pageSize = 50
-            , [ FromQuery(Name = "p") ] Int32 page = 0)
-        {
-            try
-            {
-                LoggerBundle.Trace("Registered GET request on ArtistsController.GetByLookupQuery");
-
-                if (!IsAuthorized(out IActionResult result))
-                {
-                    LoggerBundle.Trace("Request not authorized");
-                    return result;
-                }
-
-                // validate
-                if (String.IsNullOrWhiteSpace(query))
-                {
-                    LoggerBundle.Trace("Validation failed: empty query");
-                    return StatusCode((Int32) HttpStatusCode.BadRequest);
-                }
-
-                NormalizePageSize(ref pageSize);
-                query = query.Trim();
-
-                // get data
-                using (DataContext dc = DataContextFactory.GetInstance())
-                {
-                    return Ok(dc.SetArtists.AsNoTracking()
-                        .Where(x => x.Name.Equals(query))
-                        .Include(x => x.MusicBrainzArtistMusicBrainzAliases)
-                        .ThenInclude(x => x.MusicBrainzAlias)
-                        .OrderBy(x => x.UniqueId)
-                        .Skip(page * pageSize)
                         .Take(pageSize)
                         .Select(x => x.ToJsonDictionary())
                         .ToList());

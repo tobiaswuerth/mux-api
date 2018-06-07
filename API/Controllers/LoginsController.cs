@@ -19,29 +19,6 @@ namespace ch.wuerth.tobias.mux.API.Controllers
     {
         private static readonly UserJwtPayloadPipe UserJwtPayloadPipe = new UserJwtPayloadPipe();
 
-        private IActionResult ProcessPayload(JwtPayload payload)
-        {
-            // generate token
-            String token = JwtGenerator.GetToken(payload, Config.Authorization.Secret, Config.Authorization.ExpirationShift);
-
-            if (String.IsNullOrWhiteSpace(token))
-            {
-                LoggerBundle.Warn("JWT token generation failed: empty token");
-                return StatusCode((Int32) HttpStatusCode.InternalServerError);
-            }
-
-            return Ok(new Dictionary<String, String>
-            {
-                {
-                    "token", token
-                }
-                ,
-                {
-                    "expires", payload.Exp.ToString(CultureInfo.InvariantCulture)
-                }
-            });
-        }
-
         [ HttpPost("public/login") ]
         public IActionResult Login([ FromBody ] AuthenticationModel values)
         {
@@ -90,8 +67,32 @@ namespace ch.wuerth.tobias.mux.API.Controllers
             }
             catch (Exception ex)
             {
-                return HandleException(ex);
+                LoggerBundle.Error(ex);
+                return StatusCode((Int32) HttpStatusCode.Unauthorized);
             }
+        }
+
+        private IActionResult ProcessPayload(JwtPayload payload)
+        {
+            // generate token
+            String token = JwtGenerator.GetToken(payload, Config.Authorization.Secret, Config.Authorization.ExpirationShift);
+
+            if (String.IsNullOrWhiteSpace(token))
+            {
+                LoggerBundle.Warn("JWT token generation failed: empty token");
+                return StatusCode((Int32) HttpStatusCode.InternalServerError);
+            }
+
+            return Ok(new Dictionary<String, String>
+            {
+                {
+                    "token", token
+                }
+                ,
+                {
+                    "expires", payload.Exp.ToString(CultureInfo.InvariantCulture)
+                }
+            });
         }
 
         [ HttpGet("auth/login") ]
