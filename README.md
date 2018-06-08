@@ -86,6 +86,36 @@ delete a specific invite
 * POST `auth/invites/{token}`
 use an invite to register a new user
 
+### Files
+* GET	`auth/files/{id}`
+the actual file for a given track id
+
+### Globals
+* GET	`auth/globals`
+some globally relevant values, e.g. total release count
+
+### Playlists
+* PUT	`auth/playlists`
+creates new playlist
+* PUT	`auth/playlists/{id}/entries`
+creates a new entry in a playlist
+* PUT	`auth/playlists/{id}/permissions`
+creates or updates permission for a user in a playlist
+* DELETE	`auth/playlists/{id}`
+deletes a playlist
+* DELETE	`auth/playlists/{playlistId}/entries/{entryId}`
+deletes an entry from a playlist
+* DELETE	`auth/playlists/{playlistId}/permissions/{permissionId}`
+deletes a permission from a playlist
+* GET*	`auth/playlists`
+all playlists
+* GET	`auth/playlists/{id}`
+get details for one specific playlist
+
+### Users
+* GET*	`auth/users`
+gets all users
+
 ## Example Bodies
 All bodies are expected to be in valid JSON format.
 
@@ -104,6 +134,30 @@ All bodies are expected to be in valid JSON format.
     "password": "your_base64_password"
 }
 ```
+
+* PUT @ `auth/playlists`
+```json
+{
+	"name": "playlist_name"
+}
+```
+
+* PUT @ `auth/playlists/{id}/entries`
+```json
+{
+	"title": "entry_title",
+	"trackId": 123
+}
+```
+
+* PUT @ `auth/playlists/{id}/permissions`
+```json
+{
+	"userId": 123,
+	"canModify": false
+}
+```
+
 -----
 
 **Note:**
