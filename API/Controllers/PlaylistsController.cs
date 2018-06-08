@@ -152,6 +152,97 @@ namespace ch.wuerth.tobias.mux.API.Controllers
             }
         }
 
+        [ HttpPut("auth/playlists/{id}/permissions") ]
+        public IActionResult CreatePermission(Int32? id, [ FromBody ] PlaylistPermissionModel model)
+        {
+            try
+            {
+                LoggerBundle.Trace("Registered PUT request on PlaylistsController.CreatePermission");
+
+                if (!IsAuthorized(out IActionResult result))
+                {
+                    LoggerBundle.Trace("Request not authorized");
+                    return result;
+                }
+
+                // validate
+                if (!id.HasValue)
+                {
+                    LoggerBundle.Trace("Validation failed: id is null");
+                    return StatusCode((Int32) HttpStatusCode.BadRequest);
+                }
+
+                if (null == model)
+                {
+                    LoggerBundle.Trace("Validation failed: model is null");
+                    return StatusCode((Int32) HttpStatusCode.BadRequest);
+                }
+
+                Int32? userId = model.UserId;
+                if (!userId.HasValue)
+                {
+                    LoggerBundle.Trace("Validation failed: user identifier is null");
+                    return StatusCode((Int32) HttpStatusCode.BadRequest);
+                }
+
+                // get data
+                using (DataContext dc = DataContextFactory.GetInstance())
+                {
+                    User user = dc.SetUsers.FirstOrDefault(x => x.UniqueId.Equals(userId));
+                    if (null == user)
+                    {
+                        LoggerBundle.Trace($"Validation failed: no user found for given id '{userId}'");
+                        return StatusCode((Int32) HttpStatusCode.NotFound);
+                    }
+
+                    Playlist playlist = dc.SetPlaylists.Include(x => x.PlaylistEntries)
+                        .ThenInclude(x => x.Track)
+                        .Include(x => x.PlaylistEntries)
+                        .ThenInclude(x => x.CreateUser)
+                        .Include(x => x.PlaylistPermissions)
+                        .ThenInclude(x => x.User)
+                        .Where(x => x.CreateUser.UniqueId.Equals(AuthorizedUser.UniqueId))
+                        .FirstOrDefault(x => x.UniqueId.Equals(id));
+
+                    if (null == playlist)
+                    {
+                        LoggerBundle.Trace($"Validation failed: no playlist found for given id '{id}'");
+                        return StatusCode((Int32) HttpStatusCode.NotFound);
+                    }
+
+                    PlaylistPermission userPermission =
+                        playlist.PlaylistPermissions.FirstOrDefault(x => x.User.UniqueId.Equals(userId));
+                    if (null != userPermission)
+                    {
+                        // already exists
+                        if (userPermission.CanModify != model.CanModify)
+                        {
+                            userPermission.CanModify = model.CanModify;
+                            dc.SaveChanges();
+                        }
+
+                        return Ok(playlist.ToJsonDictionary());
+                    }
+
+                    userPermission = new PlaylistPermission
+                    {
+                        Playlist = playlist
+                        , CanModify = model.CanModify
+                        , User = user
+                    };
+
+                    dc.SetPlaylistPermissions.Add(userPermission);
+                    dc.SaveChanges();
+
+                    return Ok(playlist.ToJsonDictionary());
+                }
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
+        }
+
         [ HttpDelete("auth/playlists/{id}") ]
         public IActionResult Delete(Int32? id)
         {
@@ -254,6 +345,71 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                     }
 
                     dc.SetPlaylistEntries.Remove(entry);
+                    dc.SaveChanges();
+
+                    return Ok(playlist.ToJsonDictionary());
+                }
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
+        }
+
+        [ HttpDelete("auth/playlists/{playlistId}/permissions/{permissionId}") ]
+        public IActionResult DeletePermission(Int32? playlistId, Int32? permissionId)
+        {
+            try
+            {
+                LoggerBundle.Trace("Registered DELETE request on PlaylistsController.DeletePermission");
+
+                if (!IsAuthorized(out IActionResult result))
+                {
+                    LoggerBundle.Trace("Request not authorized");
+                    return result;
+                }
+
+                // validate
+                if (!playlistId.HasValue)
+                {
+                    LoggerBundle.Trace("Validation failed: playlist id is null");
+                    return StatusCode((Int32) HttpStatusCode.BadRequest);
+                }
+
+                if (!permissionId.HasValue)
+                {
+                    LoggerBundle.Trace("Validation failed: permission id is null");
+                    return StatusCode((Int32) HttpStatusCode.BadRequest);
+                }
+
+                // get data
+                using (DataContext dc = DataContextFactory.GetInstance())
+                {
+                    Playlist playlist = dc.SetPlaylists.Include(x => x.PlaylistEntries)
+                        .ThenInclude(x => x.Track)
+                        .Include(x => x.PlaylistEntries)
+                        .ThenInclude(x => x.CreateUser)
+                        .Include(x => x.PlaylistPermissions)
+                        .ThenInclude(x => x.User)
+                        .Where(x => x.CreateUser.UniqueId.Equals(AuthorizedUser.UniqueId))
+                        .FirstOrDefault(x => x.UniqueId.Equals(playlistId));
+
+                    if (null == playlist)
+                    {
+                        LoggerBundle.Trace($"Validation failed: no playlist found for given id '{playlistId}'");
+                        return StatusCode((Int32) HttpStatusCode.NotFound);
+                    }
+
+                    PlaylistPermission entry =
+                        playlist.PlaylistPermissions.FirstOrDefault(x => x.UniqueId.Equals(permissionId));
+
+                    if (null == entry)
+                    {
+                        LoggerBundle.Trace($"Validation failed: no entry found in playlist for given id '{permissionId}'");
+                        return StatusCode((Int32) HttpStatusCode.NotFound);
+                    }
+
+                    dc.SetPlaylistPermissions.Remove(entry);
                     dc.SaveChanges();
 
                     return Ok(playlist.ToJsonDictionary());
