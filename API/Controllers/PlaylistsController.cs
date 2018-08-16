@@ -117,7 +117,8 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                         return StatusCode((Int32) HttpStatusCode.NotFound);
                     }
 
-                    Playlist playlist = dc.SetPlaylists.Include(x => x.PlaylistEntries)
+                    Playlist playlist = dc.SetPlaylists.Include(x => x.CreateUser)
+                        .Include(x => x.PlaylistEntries)
                         .ThenInclude(x => x.Track)
                         .Include(x => x.PlaylistEntries)
                         .ThenInclude(x => x.CreateUser)
@@ -195,7 +196,8 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                         return StatusCode((Int32) HttpStatusCode.NotFound);
                     }
 
-                    Playlist playlist = dc.SetPlaylists.Include(x => x.PlaylistEntries)
+                    Playlist playlist = dc.SetPlaylists.Include(x => x.CreateUser)
+                        .Include(x => x.PlaylistEntries)
                         .ThenInclude(x => x.Track)
                         .Include(x => x.PlaylistEntries)
                         .ThenInclude(x => x.CreateUser)
@@ -320,7 +322,8 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 // get data
                 using (DataContext dc = DataContextFactory.GetInstance())
                 {
-                    Playlist playlist = dc.SetPlaylists.Include(x => x.PlaylistEntries)
+                    Playlist playlist = dc.SetPlaylists.Include(x => x.CreateUser)
+                        .Include(x => x.PlaylistEntries)
                         .ThenInclude(x => x.Track)
                         .Include(x => x.PlaylistEntries)
                         .ThenInclude(x => x.CreateUser)
@@ -385,7 +388,8 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 // get data
                 using (DataContext dc = DataContextFactory.GetInstance())
                 {
-                    Playlist playlist = dc.SetPlaylists.Include(x => x.PlaylistEntries)
+                    Playlist playlist = dc.SetPlaylists.Include(x => x.CreateUser)
+                        .Include(x => x.PlaylistEntries)
                         .ThenInclude(x => x.Track)
                         .Include(x => x.PlaylistEntries)
                         .ThenInclude(x => x.CreateUser)
@@ -441,7 +445,10 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 {
                     dc.SetUsers.Attach(AuthorizedUser);
 
-                    List<Playlist> playlists = AuthorizedUser.PlaylistPermissions.Select(x => x.Playlist).ToList();
+                    List<Playlist> playlists = AuthorizedUser.PlaylistPermissions.Skip(pageSize * page)
+                        .Take(pageSize)
+                        .Select(x => x.Playlist)
+                        .ToList();
                     playlists.AddRange(AuthorizedUser.Playlists);
                     playlists.Sort((a, b) => String.CompareOrdinal(a.Name, b.Name));
 
@@ -491,6 +498,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 using (DataContext dc = DataContextFactory.GetInstance())
                 {
                     Playlist playlist = dc.SetPlaylists.AsNoTracking()
+                        .Include(x => x.CreateUser)
                         .Include(x => x.PlaylistEntries)
                         .ThenInclude(x => x.Track)
                         .Include(x => x.PlaylistEntries)
@@ -506,6 +514,64 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                         LoggerBundle.Trace($"No playlist found for given id '{id}'");
                         return StatusCode((Int32) HttpStatusCode.NotFound);
                     }
+
+                    return Ok(playlist.ToJsonDictionary());
+                }
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
+        }
+
+        [ HttpPut("auth/playlists/{id}") ]
+        public IActionResult Update(Int32? id, [ FromBody ] PlaylistModel model)
+        {
+            try
+            {
+                LoggerBundle.Trace("Registered UPDATE request on PlaylistsController.Update");
+
+                if (!IsAuthorized(out IActionResult result))
+                {
+                    LoggerBundle.Trace("Request not authorized");
+                    return result;
+                }
+
+                // validate
+                if (!id.HasValue)
+                {
+                    LoggerBundle.Trace("Validation failed: id is null");
+                    return StatusCode((Int32) HttpStatusCode.BadRequest);
+                }
+
+                String name = model.Name?.Trim();
+                if (String.IsNullOrWhiteSpace(name) || name.Length < 3)
+                {
+                    LoggerBundle.Trace("Validation failed: invalid name");
+                    return StatusCode((Int32) HttpStatusCode.BadRequest);
+                }
+
+                // get data
+                using (DataContext dc = DataContextFactory.GetInstance())
+                {
+                    Playlist playlist = dc.SetPlaylists.Include(x => x.CreateUser)
+                        .Include(x => x.PlaylistEntries)
+                        .ThenInclude(x => x.Track)
+                        .Include(x => x.PlaylistEntries)
+                        .ThenInclude(x => x.CreateUser)
+                        .Include(x => x.PlaylistPermissions)
+                        .ThenInclude(x => x.User)
+                        .Where(x => x.CreateUser.UniqueId.Equals(AuthorizedUser.UniqueId))
+                        .FirstOrDefault(x => x.UniqueId.Equals(id));
+
+                    if (null == playlist)
+                    {
+                        LoggerBundle.Trace($"No playlist found for given id '{id}'");
+                        return StatusCode((Int32) HttpStatusCode.NotFound);
+                    }
+
+                    playlist.Name = name;
+                    dc.SaveChanges();
 
                     return Ok(playlist.ToJsonDictionary());
                 }
