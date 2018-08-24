@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ch.wuerth.tobias.mux.API.extensions;
 using ch.wuerth.tobias.mux.Core.logging;
 using ch.wuerth.tobias.mux.Data;
 using Microsoft.AspNetCore.Mvc;
@@ -31,16 +32,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                         .OrderBy(x => x.Username)
                         .Skip(page * pageSize)
                         .Take(pageSize)
-                        .Select(x => new Dictionary<String, Object>
-                        {
-                            {
-                                "UniqueId", x.UniqueId
-                            }
-                            ,
-                            {
-                                "Username", x.Username
-                            }
-                        })
+                        .Select(x => x.ToJsonDictionary())
                         .ToList());
                 }
             }
