@@ -15,7 +15,7 @@ namespace ch.wuerth.tobias.mux.API.extensions
                 }
                 ,
                 {
-                    "Username", obj.User?.Username
+                    "User", obj.User?.ToJsonDictionary()
                 }
                 ,
                 {

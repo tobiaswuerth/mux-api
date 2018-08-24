@@ -20,7 +20,7 @@ namespace ch.wuerth.tobias.mux.API.extensions
                 }
                 ,
                 {
-                    "CreateUser", obj.CreateUser?.Username
+                    "CreateUser", obj.CreateUser?.ToJsonDictionary()
                 }
                 ,
                 {
