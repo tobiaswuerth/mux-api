@@ -445,11 +445,16 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 {
                     dc.SetUsers.Attach(AuthorizedUser);
 
-                    List<Playlist> playlists = AuthorizedUser.PlaylistPermissions.Skip(pageSize * page)
+                    List<Playlist> playlists = dc.SetPlaylists.AsNoTracking()
+                        .Include(x => x.CreateUser)
+                        .Include(x => x.PlaylistPermissions)
+                        .ThenInclude(x => x.User)
+                        .Where(x => x.CreateUser.UniqueId.Equals(AuthorizedUser.UniqueId)
+                            || x.PlaylistPermissions.Any(y => y.User.UniqueId.Equals(AuthorizedUser.UniqueId)))
+                        .Skip(page * pageSize)
                         .Take(pageSize)
-                        .Select(x => x.Playlist)
                         .ToList();
-                    playlists.AddRange(AuthorizedUser.Playlists);
+
                     playlists.Sort((a, b) => String.CompareOrdinal(a.Name, b.Name));
 
                     return Ok(playlists.Select(x => new Dictionary<String, Object>
@@ -463,7 +468,13 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                         }
                         ,
                         {
-                            "CreateUser", x.CreateUser?.Username
+                            "CreateUser", x.CreateUser.ToJsonDictionary()
+                        }
+                        ,
+                        {
+                            "CanModify"
+                            , x.CreateUser.UniqueId.Equals(AuthorizedUser.UniqueId)
+                            || x.PlaylistPermissions.Any(y => y.User.UniqueId.Equals(AuthorizedUser.UniqueId) && y.CanModify)
                         }
                     }));
                 }
