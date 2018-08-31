@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using ch.wuerth.tobias.mux.API.extensions;
 using ch.wuerth.tobias.mux.Core.logging;
