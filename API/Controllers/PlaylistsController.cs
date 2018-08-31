@@ -451,11 +451,10 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                         .ThenInclude(x => x.User)
                         .Where(x => x.CreateUser.UniqueId.Equals(AuthorizedUser.UniqueId)
                             || x.PlaylistPermissions.Any(y => y.User.UniqueId.Equals(AuthorizedUser.UniqueId)))
+                        .OrderBy(x => x.Name)
                         .Skip(page * pageSize)
                         .Take(pageSize)
                         .ToList();
-
-                    playlists.Sort((a, b) => String.CompareOrdinal(a.Name, b.Name));
 
                     return Ok(playlists.Select(x => new Dictionary<String, Object>
                     {
