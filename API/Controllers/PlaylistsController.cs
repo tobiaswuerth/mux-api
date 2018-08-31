@@ -99,7 +99,7 @@ namespace ch.wuerth.tobias.mux.API.Controllers
                 }
 
                 String title = model.Title?.Trim();
-                if (String.IsNullOrWhiteSpace(title) || title.Length < 3)
+                if (String.IsNullOrWhiteSpace(title))
                 {
                     LoggerBundle.Trace("Validation failed: invalid title");
                     return StatusCode((Int32) HttpStatusCode.BadRequest);
