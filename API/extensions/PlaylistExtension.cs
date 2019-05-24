@@ -7,8 +7,19 @@ namespace ch.wuerth.tobias.mux.API.extensions
 {
     public static class PlaylistExtension
     {
+        private static void SortPlaylistProperties(Playlist playlist)
+        {
+            playlist.PlaylistEntries?.Sort((a, b)
+                => String.Compare(a.Title, b.Title, StringComparison.InvariantCultureIgnoreCase));
+
+            playlist.PlaylistPermissions?.Sort((a, b)
+                => String.Compare(a.User?.Username, b.User?.Username, StringComparison.InvariantCultureIgnoreCase));
+        }
+
         public static Dictionary<String, Object> ToJsonDictionary(this Playlist obj)
         {
+            SortPlaylistProperties(obj);
+
             return new Dictionary<String, Object>
             {
                 {
@@ -20,7 +31,7 @@ namespace ch.wuerth.tobias.mux.API.extensions
                 }
                 ,
                 {
-                    "CreateUser", obj.CreateUser?.Username
+                    "CreateUser", obj.CreateUser?.ToJsonDictionary()
                 }
                 ,
                 {

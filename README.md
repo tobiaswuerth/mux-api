@@ -111,6 +111,8 @@ deletes a permission from a playlist
 all playlists
 * GET	`auth/playlists/{id}`
 get details for one specific playlist
+* PUT   `auth/playlists/{id}`
+update playlist properties
 
 ### Users
 * GET*	`auth/users`
@@ -138,23 +140,30 @@ All bodies are expected to be in valid JSON format.
 * PUT @ `auth/playlists`
 ```json
 {
-	"name": "playlist_name"
+    "name": "playlist_name"
+}
+```
+
+* PUT @ `auth/playlists/{id}`
+```json
+{
+    "name": "playlist_name"
 }
 ```
 
 * PUT @ `auth/playlists/{id}/entries`
 ```json
 {
-	"title": "entry_title",
-	"trackId": 123
+    "title": "entry_title",
+    "trackId": 123
 }
 ```
 
 * PUT @ `auth/playlists/{id}/permissions`
 ```json
 {
-	"userId": 123,
-	"canModify": false
+    "userId": 123,
+    "canModify": false
 }
 ```
 
